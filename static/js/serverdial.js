@@ -1,5 +1,14 @@
 // adapted from http://www.asterixcreative.com/blog-mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-pt1.html
 
+// serverdial is simply a computer model of a future sundial
+// specific to the exact geolocation and gyroscope of the device used to view it
+// but using an NTP instead of the sun to produce the shadow (time)
+
+// gnomon angle adjusts with user's latitude
+// number displacement on the dial adjusts with user's latitude
+// fonts -- either roman numerals or else data points for mtdbt2f numbers
+
+
 
 // 0. init, process gyro data
 
@@ -238,7 +247,7 @@ function makePlaneWithTriangle(width,height,depth) {
 	var hd=depth/2;
 	newObj.vertices=[  	
 				[-hw,hh,hd],[hw,hh,hd],[hw,-hh,hd], // first triangle
-                                [-hw,hh,hd],[-hw,-hh,hd],[hw,-hh,hd] // 2 triangles make front side
+                [-hw,hh,hd],[-hw,-hh,hd],[hw,-hh,hd] // 2 triangles make front side
 	];
 	
 	return newObj;
@@ -291,7 +300,8 @@ var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 minAxis.color="black";
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 secAxis.color="black";
-
+var gnomon=makeTriangle(canvas.width/100, canvas.width/2, canvas.width/20);
+gnomon.color="blue";
 
 
 
@@ -475,6 +485,8 @@ function renderLoop() {
   renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
   renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
   renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
+
+  renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 }
 
 // using setInterval instead of manual approach suggested
