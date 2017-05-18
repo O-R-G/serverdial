@@ -8,14 +8,13 @@
 // number displacement on the dial adjusts with user's latitude
 // fonts -- either roman numerals or else data points for mtdbt2f numbers
 
-var simulateGyro = true;                    // for debug to turn off/on in console 
-// var simulateGyro = false;                    
 
 
 
 // 0. init, process gyro data
 
 var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
+var simulateGyro = true;    // for debug to turn off/on in console 
 
 function debug () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
@@ -58,7 +57,6 @@ function processGyro(alpha,beta,gamma)
 	document.getElementById("z").innerHTML = gyro.z.toFixed(5);
 	document.getElementById("w").innerHTML = gyro.w.toFixed(5);
 }
-	
 
 // canvas context
 
@@ -293,34 +291,26 @@ function makeArcWithTriangle(width,height,depth) {
 	return newObj;
 }
 
-var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
-// var cube=makePlaneWithTriangle(canvas.width/5, canvas.width/5, canvas.width/5);
-cube.color="yellow";
-// var hourAxis=makePlaneWithTriangle(canvas.width/5, canvas.width/5, canvas.width/5);
+// geometry
 var hourAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-hourAxis.color="red";
 var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-minAxis.color="blue";
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
+var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
+
+var gnomon=makeRect(canvas.width/2.0, 4.0, 4.0);
+var gnomonQuat = makeQuat(0,.15,0,1);
+
+var shadow=makeRect(canvas.width/2.25, 6.0, 0.0);
+
+// colors
+hourAxis.color="red";
+minAxis.color="blue";
 secAxis.color="purple";
-
-
-// rotate this first? or just set the proper quaternion for rotation
-// likely the latter
-
-// var gnomon=makeTriangle(canvas.width/100, canvas.width/2, canvas.width/20);
-// var gnomon=makeTriangle(100, 100, 100);
-var gnomon=makeRect(canvas.width/2.0, 1, 1);
+cube.color="yellow";
 gnomon.color="purple";
+shadow.color="grey";
 
-// var gnomonQuat = quatFromAxisAngle(0,0,0,90);
-var gnomonQuat = makeQuat(.7,.5,.5,.5);
-// var gnomonQuat = makeQuat(.5,.5,1.0,.5);
-// var gnomonQuat = makeQuat(1,0,0,.5);
-// var gnomonQuat = makeQuat(.5,.5,.5,0);
-// var gnomonQuat = makeQuat(.5,.5,.5,0);
-// var gnomonQuat = makeQuat(1,1,1,.5);
-
+// debug 
 var debugTriangle=makeTriangle(100,100,100);
 debugTriangle.color="black";
 
@@ -361,9 +351,9 @@ function renderObj(obj,q) {
 		    context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
     		if (debugFlag) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 
-            context.stroke();				            // all
+            // context.stroke();				            // all
 	    	// if (k % 2 == 0) context.stroke();		    // spokes only
-		    // if (k % 2 != 0) context.stroke();		    // points only
+		    if (k % 2 != 0) context.stroke();		    // points only
 		}
 	}
 }
@@ -490,18 +480,20 @@ function renderLoop() {
     // renderObj(secAxis,userQuat);
     // renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro)]));
     renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    // renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
-    // renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
+    renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
+    renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
+
+    // quaternion rotations should be applied in opposite order
+    // order of individual rotation matters -- generally z > y > x
+    // and that is taken care of within the quaternion rotation functions
+    // here the last rotation (the internal gyroscope) is applied first
+    // and the first, which simply locates the gnomon, is applied last
+    // the userQuat is what has been adjusted with touch or mouse events by user
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
-    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),gnomonQuat,userQuat]));
-    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    // renderObj(gnomon,quaternionMultiply([userQuat,gnomonQuat]));
-    // renderObj(gnomon,quaternionMultiply([gnomonQuat,userQuat]));
-    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(userQuat),gnomonQuat]));
-    // renderObj(gnomon, gnomonQuat);
+    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
-    renderObj(debugTriangle, userQuat);
+    // renderObj(debugTriangle, userQuat);
 }
 
 // using setInterval instead of manual approach suggested
