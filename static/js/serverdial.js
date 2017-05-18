@@ -10,7 +10,6 @@
 
 
 
-
 // 0. init, process gyro data
 
 var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
@@ -65,7 +64,8 @@ var context = canvas.getContext('2d');
 context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
 context.canvas.height = window.innerHeight;
 context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
-context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
+// context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
+context.font = "20px Helvetica";      
 context.fillStyle = "#EEE";
 
 // process gyroscope data
@@ -162,6 +162,29 @@ function rotatePointViaQuaternion(pointRa,q) {
 	}
 }	  
 
+// transforms
+
+function transformObject(obj,x,y,z) {
+
+    var point={};
+  	var newObj={};
+	newObj.vertices=[];
+
+	for(var i=0 ; i<obj.vertices.length ; i++) {
+        // faster to operate directly on object? or better to make a copy?
+        // for now, making a copy as that is how it's done elsewhere
+	    // obj.vertices[i][0]+=x;
+	    // obj.vertices[i][1]+=y;
+	    // obj.vertices[i][2]+=z;
+        point.x = obj.vertices[i][0] + x;
+        point.y = obj.vertices[i][1] + y;
+        point.z = obj.vertices[i][2] + z;
+        newObj.vertices.push([point.x,point.y, point.z]);
+    }
+
+	// return obj;
+	return newObj;
+}
 
 
 
@@ -292,24 +315,28 @@ function makeArcWithTriangle(width,height,depth) {
 }
 
 // geometry
+
 var hourAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
 var gnomon=makeRect(canvas.width/2.0, 4.0, 4.0);
-var gnomonQuat = makeQuat(0,.15,0,1);
+var gnomonQuat = makeQuat(.2,.15,1,.2);
+gnomon = rotateObject(gnomon,gnomonQuat);
+gnomon = transformObject(gnomon,0,0,40);
 
-var shadow=makeRect(canvas.width/2.25, 6.0, 0.0);
-var shadowQuat = makeQuat(0,0,.2,1);
+var shadow = makeRect(canvas.width/2.25, 1.0, 0.0);
+var shadowQuat = makeQuat(0,0,1,.2);
+shadow = rotateObject(shadow,shadowQuat);
 
 // colors
 hourAxis.color="red";
-minAxis.color="blue";
-secAxis.color="purple";
+minAxis.color="green";
+secAxis.color="blue";
 cube.color="yellow";
 gnomon.color="purple";
-shadow.color="grey";
+shadow.color="black";
 
 // debug 
 var debugTriangle=makeTriangle(100,100,100);
@@ -350,11 +377,16 @@ function renderObj(obj,q) {
     		// original w/ focal length
 	    	context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 		    context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
-    		if (debugFlag) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
+    		
+            // if (debugFlag) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 
-            // context.stroke();				            // all
-	    	// if (k % 2 == 0) context.stroke();		    // spokes only
-		    if (k % 2 != 0) context.stroke();		    // points only
+            if (debugFlag) {
+                context.stroke();	// all
+	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
+            } else {
+		        if (k % 2 != 0) context.stroke();		    // points only
+	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
+            }
 		}
 	}
 }
@@ -491,8 +523,10 @@ function renderLoop() {
     // and the first, which simply locates the gnomon, is applied last
     // the userQuat is what has been adjusted with touch or mouse events by user
 
-    renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
-    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat,shadowQuat]));
+    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
+    renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat,shadowQuat]));
+    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     // renderObj(debugTriangle, userQuat);
 }
