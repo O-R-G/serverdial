@@ -14,7 +14,7 @@
 // 0. init, process gyro data
 
 var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
-var simulateGyro = true;    // for debug to turn off/on in console 
+var simulateGyro = false;    // for debug to turn off/on in console 
 
 function debug () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
@@ -301,6 +301,7 @@ var gnomon=makeRect(canvas.width/2.0, 4.0, 4.0);
 var gnomonQuat = makeQuat(0,.15,0,1);
 
 var shadow=makeRect(canvas.width/2.25, 6.0, 0.0);
+var shadowQuat = makeQuat(0,0,.2,1);
 
 // colors
 hourAxis.color="red";
@@ -491,7 +492,7 @@ function renderLoop() {
     // the userQuat is what has been adjusted with touch or mouse events by user
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
-    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat,shadowQuat]));
 
     // renderObj(debugTriangle, userQuat);
 }
