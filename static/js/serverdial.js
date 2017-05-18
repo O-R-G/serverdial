@@ -321,7 +321,7 @@ var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
-var gnomon=makeRect(canvas.width/2.0, 4.0, 4.0);
+var gnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
 var gnomonQuat = makeQuat(.2,.15,1,.2);
 gnomon = rotateObject(gnomon,gnomonQuat);
 gnomon = transformObject(gnomon,0,0,40);
@@ -330,6 +330,17 @@ var shadow = makeRect(canvas.width/2.25, 1.0, 0.0);
 var shadowQuat = makeQuat(0,0,1,.2);
 shadow = rotateObject(shadow,shadowQuat);
 
+// hours
+// tick marks could be added with points that are then rotated via quaternion which
+// is the z axis and rotation (w) is whatever it should be between 0 and 1 normalized
+// maybe use the degree radian conversion
+
+// hours should be an array
+
+var hours = makeRect(canvas.width/20.0, 0.5, 0.5);
+hours = transformObject(hours,-canvas.width/3,0,0);
+
+
 // colors
 hourAxis.color="red";
 minAxis.color="green";
@@ -337,6 +348,7 @@ secAxis.color="blue";
 cube.color="yellow";
 gnomon.color="purple";
 shadow.color="black";
+hours.color="red";
 
 // debug 
 var debugTriangle=makeTriangle(100,100,100);
@@ -525,8 +537,10 @@ function renderLoop() {
 
     // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    // renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat,shadowQuat]));
     renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+
+    // renderObj(hours,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    renderObj(hours,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
 
     // renderObj(debugTriangle, userQuat);
 }

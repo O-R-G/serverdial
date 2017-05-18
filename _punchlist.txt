@@ -8,5 +8,5 @@
     http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
   determines when shadow shows or not
-- three.js?
-- fonts, roman numerals?
+x three.js?
+- fonts
