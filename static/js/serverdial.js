@@ -64,8 +64,8 @@ var context = canvas.getContext('2d');
 context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
 context.canvas.height = window.innerHeight;
 context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
-// context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
-context.font = "20px Helvetica";      
+context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
+// context.font = "20px Helvetica";      
 context.fillStyle = "#EEE";
 
 // process gyroscope data
@@ -335,11 +335,13 @@ shadow = rotateObject(shadow,shadowQuat);
 // is the z axis and rotation (w) is whatever it should be between 0 and 1 normalized
 // maybe use the degree radian conversion
 
-// hours should be an array
-
-var hours = makeRect(canvas.width/20.0, 0.5, 0.5);
-hours = transformObject(hours,-canvas.width/3,0,0);
-
+var hours = [];
+for (i = 0; i < 10; i++) {
+    var hoursQuat = makeQuat(0,0,.7-(i*.07),.6+(i*.04));
+    hours[i] = makeRect(canvas.width/20.0, 0.5, 0.5);
+    hours[i] = transformObject(hours[i],-canvas.width/3,0,0);
+    hours[i] = rotateObject(hours[i],hoursQuat);
+}
 
 // colors
 hourAxis.color="red";
@@ -393,12 +395,43 @@ function renderObj(obj,q) {
             // if (debugFlag) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 
             if (debugFlag) {
-                context.stroke();	// all
+                // context.stroke();	// all
+		        if (k % 2 != 0) context.stroke();		    // points only
 	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
             } else {
 		        if (k % 2 != 0) context.stroke();		    // points only
 	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
             }
+		}
+	}
+}
+
+// perhaps this is better as an additional parameter to renderObj?
+// or better, a property of the object
+
+function renderType(obj,q) {
+
+	var rotatedObj=rotateObject(obj,q);
+	// context.fillStyle = obj.color;
+	context.fillStyle = "#FF0000";
+	
+	function scaleByZ(val,z) {
+		var focalLength=900; // [900] should probably be a global but oh well
+		var scale= focalLength/((-z)+focalLength);
+		return val*scale;
+	}
+	
+	for(var i=0 ; i<obj.vertices.length ; i+=3) {
+
+		for (var k=0;k<3;k++) {
+		  
+			var vertexFrom=rotatedObj.vertices[i+k];
+		  	var temp=i+k+1;
+		  	if(k==2) 
+			  	temp=i;
+			  
+			var vertexTo = rotatedObj.vertices[temp];		
+            context.fillText(i,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 		}
 	}
 }
@@ -525,7 +558,7 @@ function renderLoop() {
     // renderObj(secAxis,userQuat);
     // renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro)]));
     renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
+    // renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
     renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
 
     // quaternion rotations should be applied in opposite order
@@ -535,12 +568,13 @@ function renderLoop() {
     // and the first, which simply locates the gnomon, is applied last
     // the userQuat is what has been adjusted with touch or mouse events by user
 
-    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
     renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
-    // renderObj(hours,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(hours,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
+    for (i = 0; i < hours.length; i++) {
+        renderObj(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
+        // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
+    }
 
     // renderObj(debugTriangle, userQuat);
 }

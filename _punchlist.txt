@@ -1,12 +1,17 @@
 + gnomon tilt geometry
 + http://www.asterixcreative.com/blog/mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-part-1/
-- hour ticks
+/ hour ticks (array, using quaternion transform around z axis)
+  improve accuracy
+  quaternion review for 
 - hour lines
 - geolocation for latitude
+  latitude for gnomon angle
+  latitude for number layout
 - gnomon angle = latitude in degrees from equator
 - assemble hour tick marks using trigonometry 
     http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
   determines when shadow shows or not
 x three.js?
-- fonts
+- canvas fonts?
+ 
