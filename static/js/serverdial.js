@@ -67,7 +67,7 @@ var context = canvas.getContext('2d');
 context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
 context.canvas.height = window.innerHeight;
 context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
-context.font = "10px Helvetica";
+context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
 context.fillStyle = "#EEE";
 
 // process gyroscope data
@@ -321,6 +321,9 @@ var gnomonQuat = makeQuat(.7,.5,.5,.5);
 // var gnomonQuat = makeQuat(.5,.5,.5,0);
 // var gnomonQuat = makeQuat(1,1,1,.5);
 
+var debugTriangle=makeTriangle(100,100,100);
+debugTriangle.color="black";
+
 
 
 
@@ -353,15 +356,23 @@ function renderObj(obj,q) {
 			var vertexTo=rotatedObj.vertices[temp];		
 			context.beginPath();
 
-		// original w/ focal length
-		context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
-		context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
-		// if (debugFlag) context.fillText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
+            if (debugFlag) {
+                console.log("vertexFrom[0] : " + vertexFrom[0]);
+                console.log("vertexFrom[1] : " + vertexFrom[1]);
+                console.log("vertexFrom[2] : " + vertexFrom[2]);
+                console.log("vertexTo[0] : " + vertexTo[0]);
+                console.log("vertexTo[1] : " + vertexTo[1]);
+                console.log("vertexTo[2] : " + vertexTo[2]);
+            }
 
-        // context.stroke();				            // all
-		// if (k % 2 == 0) context.stroke();		    // spokes only
-		if (k % 2 != 0) context.stroke();		    // points only
+    		// original w/ focal length
+	    	context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
+		    context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
+    		if (debugFlag) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 
+            context.stroke();				            // all
+	    	// if (k % 2 == 0) context.stroke();		    // spokes only
+		    // if (k % 2 != 0) context.stroke();		    // points only
 		}
 	}
 }
@@ -479,7 +490,7 @@ function renderLoop() {
 	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
     }
   
-    renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     // renderObj(hourAxis,inverseQuaternion(gyro));
     // renderObj(minAxis,inverseQuaternion(gyro));
@@ -488,8 +499,8 @@ function renderLoop() {
     // renderObj(secAxis,userQuat);
     // renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro)]));
     renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
-    renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
+    // renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
+    // renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
     // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),gnomonQuat,userQuat]));
@@ -498,6 +509,8 @@ function renderLoop() {
     // renderObj(gnomon,quaternionMultiply([gnomonQuat,userQuat]));
     // renderObj(gnomon,quaternionMultiply([inverseQuaternion(userQuat),gnomonQuat]));
     // renderObj(gnomon, gnomonQuat);
+
+    renderObj(debugTriangle, userQuat);
 }
 
 // using setInterval instead of manual approach suggested
