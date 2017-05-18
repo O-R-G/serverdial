@@ -8,6 +8,9 @@
 // number displacement on the dial adjusts with user's latitude
 // fonts -- either roman numerals or else data points for mtdbt2f numbers
 
+var simulateGyro = true;                    // for debug to turn off/on in console 
+// var simulateGyro = false;                    
+
 
 
 // 0. init, process gyro data
@@ -33,8 +36,8 @@ function debug () {
 // document.addEventListener("click",debug);
 // document.addEventListener("touchStart",debug);
 
-var gyro=quatFromAxisAngle(0,0,0,0);
-
+var gyro = quatFromAxisAngle(0,0,0,0);
+ 
 // get orientation info, rolling back if gyro info not available
 if (window.DeviceOrientationEvent) {//
     window.addEventListener("deviceorientation", function () {//gyro
@@ -44,16 +47,16 @@ if (window.DeviceOrientationEvent) {//
 
 function processGyro(alpha,beta,gamma)
 { 	
-	document.getElementById("alpha").innerHTML=alpha.toFixed(5);
-	document.getElementById("beta").innerHTML=beta.toFixed(5);
-	document.getElementById("gamma").innerHTML =gamma.toFixed(5);
+	document.getElementById("alpha").innerHTML = alpha.toFixed(5);
+	document.getElementById("beta").innerHTML = beta.toFixed(5);
+	document.getElementById("gamma").innerHTML = gamma.toFixed(5);
 	
-	gyro=computeQuaternionFromEulers(alpha,beta,gamma);
-	  
-	 document.getElementById("x").innerHTML=gyro.x.toFixed(5);
-	 document.getElementById("y").innerHTML=gyro.y.toFixed(5);
-	 document.getElementById("z").innerHTML=gyro.z.toFixed(5);
-	 document.getElementById("w").innerHTML=gyro.w.toFixed(5);
+	gyro = computeQuaternionFromEulers(alpha,beta,gamma);
+
+	document.getElementById("x").innerHTML = gyro.x.toFixed(5);
+	document.getElementById("y").innerHTML = gyro.y.toFixed(5);
+	document.getElementById("z").innerHTML = gyro.z.toFixed(5);
+	document.getElementById("w").innerHTML = gyro.w.toFixed(5);
 }
 	
 
@@ -61,7 +64,7 @@ function processGyro(alpha,beta,gamma)
 
 var canvas = document.getElementById('gyroCanvas');
 var context = canvas.getContext('2d');
-context.canvas.width  = window.innerWidth;//resize canvas to whatever window dimensions are
+context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
 context.canvas.height = window.innerHeight;
 context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
 context.font = "10px Helvetica";
@@ -231,7 +234,7 @@ function makeTriangle(width,height,depth) {
 	var hh=height/2;
 	var hd=depth/2;
 	newObj.vertices=[  	
-				[-hw,hh,hd],[hw,hh,hd],[hw,-hh,hd] // first triangle
+        [-hw,hh,hd],[hw,hh,hd],[hw,-hh,hd] // first triangle
 	];
 	
 	return newObj;
@@ -290,26 +293,33 @@ function makeArcWithTriangle(width,height,depth) {
 	return newObj;
 }
 
-// var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
-var cube=makePlaneWithTriangle(canvas.width/5, canvas.width/5, canvas.width/5);
-cube.color="purple";
+var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
+// var cube=makePlaneWithTriangle(canvas.width/5, canvas.width/5, canvas.width/5);
+cube.color="yellow";
 // var hourAxis=makePlaneWithTriangle(canvas.width/5, canvas.width/5, canvas.width/5);
 var hourAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 hourAxis.color="red";
 var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-minAxis.color="black";
+minAxis.color="blue";
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-secAxis.color="black";
-var gnomon=makeTriangle(canvas.width/100, canvas.width/2, canvas.width/20);
-gnomon.color="blue";
+secAxis.color="purple";
 
 
+// rotate this first? or just set the proper quaternion for rotation
+// likely the latter
 
+// var gnomon=makeTriangle(canvas.width/100, canvas.width/2, canvas.width/20);
+// var gnomon=makeTriangle(100, 100, 100);
+var gnomon=makeRect(canvas.width/2.0, 1, 1);
+gnomon.color="purple";
 
-
-
-
-
+// var gnomonQuat = quatFromAxisAngle(0,0,0,90);
+var gnomonQuat = makeQuat(.7,.5,.5,.5);
+// var gnomonQuat = makeQuat(.5,.5,1.0,.5);
+// var gnomonQuat = makeQuat(1,0,0,.5);
+// var gnomonQuat = makeQuat(.5,.5,.5,0);
+// var gnomonQuat = makeQuat(.5,.5,.5,0);
+// var gnomonQuat = makeQuat(1,1,1,.5);
 
 
 
@@ -348,9 +358,9 @@ function renderObj(obj,q) {
 		context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
 		// if (debugFlag) context.fillText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 
-		// context.stroke();				// all
-		// if (k % 2 == 0) context.stroke();		// spokes only
-		if (k % 2 != 0) context.stroke();		// points only
+        // context.stroke();				            // all
+		// if (k % 2 == 0) context.stroke();		    // spokes only
+		if (k % 2 != 0) context.stroke();		    // points only
 
 		}
 	}
@@ -429,31 +439,25 @@ function mouseUpFunc(e)
 	
 function userXYmove(x,y)
 {
-
 	document.getElementById("userX").innerHTML=x;
 	document.getElementById("userY").innerHTML=y;
 	
 	if(prevTouchX != -1 ) //need valid prevTouch info to calculate swipe
 	{
-	  var xMovement=x-prevTouchX;
-	  var yMovement=y-prevTouchY;
-	  //var xMovementQuat=quatFromAxisAngle(1,0,0,y/200);//movement on y rotates x and vice versa
-	  //var yMovementQuat=quatFromAxisAngle(0,1,0,x/200);//200 is there to scale the movement way down to an intuitive amount
-	 //userQuot=quaternionMultiply([yMovementQuat,xMovementQuat]);//use reverse order
+        var xMovement=x-prevTouchX;
+	    var yMovement=y-prevTouchY;
+        // var xMovementQuat=quatFromAxisAngle(1,0,0,y/200);//movement on y rotates x and vice versa
+ 	    // var yMovementQuat=quatFromAxisAngle(0,1,0,x/200);//200 is there to scale the movement way down to an intuitive amount
+	    // userQuot=quaternionMultiply([yMovementQuat,xMovementQuat]);//use reverse order
 	 
-	 
-	 var xMovementQuat=quatFromAxisAngle(1,0,0,yMovement/200);//movement on y rotates x and vice versa
-	 var yMovementQuat=quatFromAxisAngle(0,1,0,xMovement/200);//200 is there to scale the movement way down to an intuitive amount	 
-	  userQuat=quaternionMultiply([gyro,yMovementQuat,xMovementQuat,inverseQuaternion(gyro),userQuat]);//use reverse order
-
+	    var xMovementQuat=quatFromAxisAngle(1,0,0,yMovement/200);//movement on y rotates x and vice versa
+	    var yMovementQuat=quatFromAxisAngle(0,1,0,xMovement/200);//200 is there to scale the movement way down to an intuitive amount	 
+	    userQuat=quaternionMultiply([gyro,yMovementQuat,xMovementQuat,inverseQuaternion(gyro),userQuat]);//use reverse order
 	}
 	prevTouchY=y;
 	prevTouchX=x;
 }
 
-
-
-	
 
 
 
@@ -464,29 +468,36 @@ function userXYmove(x,y)
 
 function renderLoop() {
 
-  // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
-  context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
-  
-  if(!( window.DeviceOrientationEvent && 'ontouchstart' in window))
-  {
-	this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
-	this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
-	this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
-	processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
-  }
-  
-  renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-  // renderObj(hourAxis,inverseQuaternion(gyro));
-  // renderObj(minAxis,inverseQuaternion(gyro));
-  // renderObj(secAxis,inverseQuaternion(gyro));
-  // renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-  // renderObj(secAxis,userQuat);
-  // renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro)]));
-  renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-  renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
-  renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
+    // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
+    context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
 
-  renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro))
+    {
+	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
+	    this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
+	    this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
+	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+    }
+  
+    renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+
+    // renderObj(hourAxis,inverseQuaternion(gyro));
+    // renderObj(minAxis,inverseQuaternion(gyro));
+    // renderObj(secAxis,inverseQuaternion(gyro));
+    // renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(secAxis,userQuat);
+    // renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro)]));
+    renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
+    renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
+
+    renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat,gnomonQuat]));
+    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),gnomonQuat,userQuat]));
+    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(gnomon,quaternionMultiply([userQuat,gnomonQuat]));
+    // renderObj(gnomon,quaternionMultiply([gnomonQuat,userQuat]));
+    // renderObj(gnomon,quaternionMultiply([inverseQuaternion(userQuat),gnomonQuat]));
+    // renderObj(gnomon, gnomonQuat);
 }
 
 // using setInterval instead of manual approach suggested
@@ -494,3 +505,4 @@ function renderLoop() {
 // renderLoop();
 
 renderTimer = window.setInterval(renderLoop, 1000/20);
+ 
