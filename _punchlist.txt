@@ -1,0 +1,12 @@
+/ gnomon tilt geometry
+- http://www.asterixcreative.com/blog/mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-part-1/
+- hour ticks
+- hour lines?
+- geolocation for latitude
+- gnomon angle = latitude in degrees from equator
+- assemble hour tick marks using trigonometry 
+  see sundial.pdf 
+- sunrise / sunset
+  determines when shadow shows or not
+- three.js?
+- fonts, roman numerals?
