@@ -356,15 +356,6 @@ function renderObj(obj,q) {
 			var vertexTo=rotatedObj.vertices[temp];		
 			context.beginPath();
 
-            if (debugFlag) {
-                console.log("vertexFrom[0] : " + vertexFrom[0]);
-                console.log("vertexFrom[1] : " + vertexFrom[1]);
-                console.log("vertexFrom[2] : " + vertexFrom[2]);
-                console.log("vertexTo[0] : " + vertexTo[0]);
-                console.log("vertexTo[1] : " + vertexTo[1]);
-                console.log("vertexTo[2] : " + vertexTo[2]);
-            }
-
     		// original w/ focal length
 	    	context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 		    context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
