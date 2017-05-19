@@ -549,11 +549,14 @@ for (i = 0; i < 14; i++) {
     hours[i] = rotateObject(hours[i],hoursQuat);
 }
 
-hourAxis.color="red";
+// hourAxis.color="red";
+hourAxis.color="black";
 minAxis.color="green";
-secAxis.color="blue";
+// secAxis.color="blue";
+secAxis.color="black";
 cube.color="yellow";
-gnomon.color="purple";
+// gnomon.color="purple";
+gnomon.color="black";
 shadow.color="black";
 hours.color="red";
 
