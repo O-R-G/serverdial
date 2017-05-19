@@ -2,7 +2,8 @@
 + http://www.asterixcreative.com/blog/mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-part-1/
 / hour ticks (array, using quaternion transform around z axis)
   improve accuracy
-  quaternion review for 
+  quaternion review 
+  quaternion from angle
 - hour lines
 - geolocation for latitude
   latitude for gnomon angle

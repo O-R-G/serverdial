@@ -10,10 +10,10 @@
 
 
 
-// 0. init, process gyro data
+// 0. init, process gyro data, setup canvas
 
 var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
-var simulateGyro = false;    // for debug to turn off/on in console 
+var simulateGyro = true;    // for debug to turn off/on in console 
 
 function debug () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
@@ -68,7 +68,18 @@ context.font = "20px mtdbt2f-HHH";      // need to have this available and prepp
 // context.font = "20px Helvetica";      
 context.fillStyle = "#EEE";
 
-// process gyroscope data
+
+
+
+
+
+
+
+
+
+
+
+// 1. geometry
 
 function computeQuaternionFromEulers(alpha,beta,gamma)//Alpha around Z axis, beta around X axis and gamma around Y axis intrinsic local space in that order(each axis moves depending on how the other moves so processing order is important)
 {
@@ -131,7 +142,7 @@ function makeQuat(x,y,z,w) {
 }
 
 function quatFromAxisAngle(x,y,z,angle) {
-	var q={};
+	var q = {};
 	var half_angle = angle/2;
 	q.x = x * Math.sin(half_angle);
 	q.y = y * Math.sin(half_angle);
@@ -141,6 +152,7 @@ function quatFromAxisAngle(x,y,z,angle) {
 }
 
 function rotateObject(obj,q) {
+
 	var newObj={};
 	newObj.vertices=[];
 	
@@ -151,7 +163,7 @@ function rotateObject(obj,q) {
 }
 
 function rotatePointViaQuaternion(pointRa,q) {
-	
+
 	var tempQuot = {'x':pointRa[0], 'y':pointRa[1], 'z':pointRa[2], 'w':0 };
 	var rotatedPoint=quaternionMultiply([ q , tempQuot, conjugateQuat(q)]); // inverseQuaternion(q) also works 
 
@@ -165,6 +177,8 @@ function rotatePointViaQuaternion(pointRa,q) {
 // transforms
 
 function transformObject(obj,x,y,z) {
+
+    // move all points in object specified amts
 
     var point={};
   	var newObj={};
@@ -215,7 +229,7 @@ function transformObject(obj,x,y,z) {
 
 
 
-// 1. 3d data
+// 2. 3d data
 
 function makeRect(width,height,depth) {
 
@@ -282,15 +296,15 @@ function makeArcWithTriangle(width,height,depth) {
 	// returns a 3D arc object triangle
 
 	// may not need these
-  	var newObj={};
-	var hw=width/2;
-	var hh=height/2;
-	var hd=depth/2;
+  	var newObj = {};
+	var hw = width/2;
+	var hh = height/2;
+	var hd = depth/2;
 	var thisPoint0 = [];
 	var thisPoint1 = [];
 	var thisPoint2 = [];
 
-	newObj.vertices=[];
+	newObj.vertices = [];
 	
 	// push new points [x,y,z] onto vertices[]
 
@@ -314,47 +328,6 @@ function makeArcWithTriangle(width,height,depth) {
 	return newObj;
 }
 
-// geometry
-
-var hourAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
-
-var gnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
-var gnomonQuat = makeQuat(.2,.15,1,.2);
-gnomon = rotateObject(gnomon,gnomonQuat);
-gnomon = transformObject(gnomon,0,0,40);
-
-var shadow = makeRect(canvas.width/2.25, 1.0, 0.0);
-var shadowQuat = makeQuat(0,0,1,.2);
-shadow = rotateObject(shadow,shadowQuat);
-
-// hours
-// tick marks could be added with points that are then rotated via quaternion which
-// is the z axis and rotation (w) is whatever it should be between 0 and 1 normalized
-// maybe use the degree radian conversion
-
-var hours = [];
-for (i = 0; i < 10; i++) {
-    var hoursQuat = makeQuat(0,0,.7-(i*.07),.6+(i*.04));
-    hours[i] = makeRect(canvas.width/20.0, 0.5, 0.5);
-    hours[i] = transformObject(hours[i],-canvas.width/3,0,0);
-    hours[i] = rotateObject(hours[i],hoursQuat);
-}
-
-// colors
-hourAxis.color="red";
-minAxis.color="green";
-secAxis.color="blue";
-cube.color="yellow";
-gnomon.color="purple";
-shadow.color="black";
-hours.color="red";
-
-// debug 
-var debugTriangle=makeTriangle(100,100,100);
-debugTriangle.color="black";
 
 
 
@@ -362,7 +335,9 @@ debugTriangle.color="black";
 
 
 
-// 2. render
+
+
+// 3. rendering
 
 function renderObj(obj,q) {
 
@@ -446,7 +421,7 @@ function renderType(obj,q) {
 
 
 
-// 3. user input
+// 4. user input
 
 var userQuat=quatFromAxisAngle(0,0,0,0);//a quaternion to represent the users finger swipe movement - default is no rotation
 var prevTouchX = -1; // -1 is flag for no previous touch info
@@ -534,7 +509,56 @@ function userXYmove(x,y)
 
 
 
-// 4. animate
+
+
+
+
+
+
+// 5. animate
+
+// setup stage
+
+var hourAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
+var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
+var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
+var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
+
+var gnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
+var gnomonQuat = makeQuat(.2,.15,1,.2);
+gnomon = rotateObject(gnomon,gnomonQuat);
+gnomon = transformObject(gnomon,0,0,40);
+
+var shadow = makeRect(canvas.width/2.25, 1.0, 0.0);
+var shadowQuat = makeQuat(0,0,1,.2);
+shadow = rotateObject(shadow,shadowQuat);
+
+// hours
+// tick marks could be added with points that are then rotated via quaternion which
+// is the z axis and rotation (w) is whatever it should be between 0 and 1 normalized
+// maybe use the degree radian conversion
+
+var hours = [];
+var degreeoffset = -110;
+for (i = 0; i < 14; i++) {
+    // rotate around z axis every 15° 
+    // (and then adjusted by latitude as per sundial.pdf)
+    var hoursQuat = quatFromAxisAngle(0,0,1,degToRad(i * 15 + degreeoffset));
+    hours[i] = makeRect(canvas.width/20.0, 0.5, 0.5);
+    hours[i] = transformObject(hours[i],-canvas.width/3,0,0);
+    hours[i] = rotateObject(hours[i],hoursQuat);
+}
+
+hourAxis.color="red";
+minAxis.color="green";
+secAxis.color="blue";
+cube.color="yellow";
+gnomon.color="purple";
+shadow.color="black";
+hours.color="red";
+
+var debugTriangle=makeTriangle(100,100,100);
+debugTriangle.color="black";
 
 function renderLoop() {
 

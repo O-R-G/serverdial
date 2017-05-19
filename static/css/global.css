@@ -17,7 +17,10 @@ body, #page {
 	font-family: sf-text, Helvetica, Arial, sans-serif;
 	font-size: 18px;
 	line-height: 22px;
-	
+	 
+    /* background-image: url("/media/gif/hollows-10.gif"); */
+    background-color: #FFFF00;
+
 	/*white-space:nowrap;*/
 	-webkit-font-smoothing: subpixel-antialiased;
 	-webkit-text-size-adjust: 100%;
