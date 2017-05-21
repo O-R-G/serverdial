@@ -12,14 +12,14 @@
 
 // 0. init, process gyro data, setup canvas
 
-var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
 var simulateGyro = true;    // for debug to turn off/on in console 
+var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
 
 function debug () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
 		document.getElementById('gyroInfo').style.visibility='visible';
 		document.getElementById('quatInfo').style.visibility='visible';
-		document.getElementById('mouseInfo').style.visibility='visible';	        
+		document.getElementById('mouseInfo').style.visibility='visible';
 		debugFlag = true;
 		return true;
 	} else {
@@ -59,7 +59,7 @@ function processGyro(alpha,beta,gamma) {
 // geolocation
 // https://www.w3schools.com/html/html5_geolocation.asp
 
-var x = document.getElementById("latitude");
+var display = document.getElementById("latitude");
 if (window.self) {
     getLocation();
 }
@@ -68,27 +68,27 @@ function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
-        x.innerHTML = "Geolocation not supported in this browser.";
+        display.innerHTML = "Geolocation not supported in this browser.";
     }
 }
 
 function showPosition(position) {
-    x.innerHTML = position.coords.latitude.toFixed(5) + "&deg;";
+    display.innerHTML = position.coords.latitude.toFixed(5) + "&deg;";
 }
 
 function showError(error) {
     switch(error.code) {
         case error.PERMISSION_DENIED:
-            x.innerHTML = "User denied request for Geolocation."
+            display.innerHTML = "User denied request for Geolocation."
             break;
         case error.POSITION_UNAVAILABLE:
-            x.innerHTML = "Location information unavailable."
+            display.innerHTML = "Location information unavailable."
             break;
         case error.TIMEOUT:
-            x.innerHTML = "Request for user location timed out."
+            display.innerHTML = "Request for user location timed out."
             break;
         case error.UNKNOWN_ERROR:
-            x.innerHTML = "Unknown error occurred."
+            display.innerHTML = "Unknown error occurred."
             break;
     }
 }
@@ -117,8 +117,10 @@ context.fillStyle = "#EEE";
 
 // 1. geometry
 
-function computeQuaternionFromEulers(alpha,beta,gamma)//Alpha around Z axis, beta around X axis and gamma around Y axis intrinsic local space in that order(each axis moves depending on how the other moves so processing order is important)
-{
+function computeQuaternionFromEulers(alpha,beta,gamma) {
+
+    //Alpha around Z axis, beta around X axis and gamma around Y axis intrinsic local space in that order(each axis moves depending on how the other moves so processing order is important)
+
 	var x = degToRad(beta) ; // beta value
 	var y = degToRad(gamma) ; // gamma value
 	var z = degToRad(alpha) ; // alpha value
@@ -166,18 +168,22 @@ function quaternionMultiply(quaternionArray) {
 }
 
 function inverseQuaternion(q) {
+
 	return makeQuat(q.x,q.y,q.z,-q.w);
 }
 
 function degToRad(deg) {
+
 	 return deg * Math.PI / 180; 
 }
 
 function makeQuat(x,y,z,w) {
+
 	return  {"x":x,"y":y,"z":z,"w":w};
 }
 
 function quatFromAxisAngle(x,y,z,angle) {
+
 	var q = {};
 	var half_angle = angle/2;
 	q.x = x * Math.sin(half_angle);

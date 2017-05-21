@@ -6,18 +6,19 @@
   quaternion from angle
 x three.js?
 x hour lines
-/ https:// ssl setup pair.com
-/ https:// ssl setup localhost
++ https:// ssl setup localhost
   https://gist.github.com/nrollr/4daba07c67adcb30693e
-  ** fix ** to resolve all domains directly
+/ https:// ssl setup pair.com
 + geolocation
-  error handling
++ geolocation safari, desktop
 - gnomon angle (latitude)
+  generate quaternion from euler angle based on latitude
+  use relative not absolute transformation in z
 - number layout (latitude)
   http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
   determines when shadow shows or not
-  https://github.com/mourner/suncalc
+  use library? https://github.com/mourner/suncalc
 - gnomon always starts pointing north
 - animation on load? / desktop fake gyro data
-- canvas fonts?
+- canvas fonts, roman numerals
