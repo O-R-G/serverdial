@@ -47,7 +47,8 @@
     
 <div id="mouseInfo">
 	X: <span id="userX"></span><br>
-        Y: <span id="userY"></span><br>
+    Y: <span id="userY"></span><br>
+	<span id="latitude"></span> / <span id="longitude"></span><br>
 </div>
 
 <canvas id="gyroCanvas"></canvas>

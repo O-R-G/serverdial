@@ -57,6 +57,32 @@ function processGyro(alpha,beta,gamma)
 	document.getElementById("w").innerHTML = gyro.w.toFixed(5);
 }
 
+// ** dev ** 
+
+// geolocation
+
+var x = document.getElementById("latitude");
+function getLocation() {
+    x.innerHTML = "getLocation()";
+    if (navigator.geolocation) {
+        x.innerHTML = "navigator.geolocation";
+        navigator.geolocation.getCurrentPosition(showPosition);
+        x.innerHTML = "showPosition() called";
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+        x.innerHTML = "!navigator.geolocation";
+    }
+}
+function showPosition(position) {
+    x.innerHTML = "showPosition()";
+    x.innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude; 
+}
+
+getLocation();
+
+// ** end dev **
+
+
 // canvas context
 
 var canvas = document.getElementById('gyroCanvas');
@@ -612,3 +638,16 @@ function renderLoop() {
 
 renderTimer = window.setInterval(renderLoop, 1000/20);
  
+
+
+
+
+
+
+
+
+
+
+// 6. utility
+
+
