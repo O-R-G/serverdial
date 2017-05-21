@@ -34,54 +34,64 @@ function debug () {
 // document.addEventListener("click",debug);
 // document.addEventListener("touchStart",debug);
 
+// gyroscope
+// get orientation info, rolling back if gyro info not available
+
 var gyro = quatFromAxisAngle(0,0,0,0);
  
-// get orientation info, rolling back if gyro info not available
 if (window.DeviceOrientationEvent) {//
     window.addEventListener("deviceorientation", function () {//gyro
         processGyro(event.alpha, event.beta, event.gamma); 
     }, true);
 } 
 
-function processGyro(alpha,beta,gamma)
-{ 	
+function processGyro(alpha,beta,gamma) { 	
+	gyro = computeQuaternionFromEulers(alpha,beta,gamma);
 	document.getElementById("alpha").innerHTML = alpha.toFixed(5);
 	document.getElementById("beta").innerHTML = beta.toFixed(5);
 	document.getElementById("gamma").innerHTML = gamma.toFixed(5);
-	
-	gyro = computeQuaternionFromEulers(alpha,beta,gamma);
-
 	document.getElementById("x").innerHTML = gyro.x.toFixed(5);
 	document.getElementById("y").innerHTML = gyro.y.toFixed(5);
 	document.getElementById("z").innerHTML = gyro.z.toFixed(5);
 	document.getElementById("w").innerHTML = gyro.w.toFixed(5);
 }
 
-// ** dev ** 
-
 // geolocation
+// https://www.w3schools.com/html/html5_geolocation.asp
 
 var x = document.getElementById("latitude");
+if (window.self) {
+    getLocation();
+}
+
 function getLocation() {
-    x.innerHTML = "getLocation()";
     if (navigator.geolocation) {
-        x.innerHTML = "navigator.geolocation";
-        navigator.geolocation.getCurrentPosition(showPosition);
-        x.innerHTML = "showPosition() called";
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
-        x.innerHTML = "!navigator.geolocation";
+        x.innerHTML = "Geolocation not supported in this browser.";
     }
 }
+
 function showPosition(position) {
-    x.innerHTML = "showPosition()";
-    x.innerHTML = "Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude; 
+    x.innerHTML = position.coords.latitude.toFixed(5) + "&deg;";
 }
 
-getLocation();
-
-// ** end dev **
-
+function showError(error) {
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            x.innerHTML = "User denied request for Geolocation."
+            break;
+        case error.POSITION_UNAVAILABLE:
+            x.innerHTML = "Location information unavailable."
+            break;
+        case error.TIMEOUT:
+            x.innerHTML = "Request for user location timed out."
+            break;
+        case error.UNKNOWN_ERROR:
+            x.innerHTML = "Unknown error occurred."
+            break;
+    }
+}
 
 // canvas context
 
@@ -90,8 +100,8 @@ var context = canvas.getContext('2d');
 context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
 context.canvas.height = window.innerHeight;
 context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
-context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
-// context.font = "20px Helvetica";      
+// context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
+context.font = "20px Helvetica";      // this is used for canvas drwg if necc (numbers?)
 context.fillStyle = "#EEE";
 
 

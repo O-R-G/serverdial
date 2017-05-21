@@ -6,13 +6,18 @@
   quaternion from angle
 x three.js?
 x hour lines
-- geolocation
-/ https secure server set up
+/ https:// ssl setup pair.com
+/ https:// ssl setup localhost
+  https://gist.github.com/nrollr/4daba07c67adcb30693e
+  ** fix ** to resolve all domains directly
++ geolocation
+  error handling
 - gnomon angle (latitude)
 - number layout (latitude)
-    http://www.crbond.com/papers/sundial.pdf
+  http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
   determines when shadow shows or not
+  https://github.com/mourner/suncalc
+- gnomon always starts pointing north
 - animation on load? / desktop fake gyro data
 - canvas fonts?
- 
