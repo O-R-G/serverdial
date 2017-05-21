@@ -1,18 +1,18 @@
 + gnomon tilt geometry
 + http://www.asterixcreative.com/blog/mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-part-1/
-/ hour ticks (array, using quaternion transform around z axis)
++ hour ticks (array, using quaternion transform around z axis)
   improve accuracy
   quaternion review 
   quaternion from angle
-- hour lines
-- geolocation for latitude
-  latitude for gnomon angle
-  latitude for number layout
-- gnomon angle = latitude in degrees from equator
-- assemble hour tick marks using trigonometry 
+x three.js?
+x hour lines
+- geolocation
+/ https secure server set up
+- gnomon angle (latitude)
+- number layout (latitude)
     http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
   determines when shadow shows or not
-x three.js?
+- animation on load? / desktop fake gyro data
 - canvas fonts?
  
