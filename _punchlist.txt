@@ -8,7 +8,7 @@ x three.js?
 x hour lines
 + https:// ssl setup localhost
   https://gist.github.com/nrollr/4daba07c67adcb30693e
-/ https:// ssl setup pair.com
++ https:// ssl setup pair.com
 + geolocation
 + geolocation safari, desktop
 - gnomon angle (latitude)

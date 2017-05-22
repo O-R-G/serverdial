@@ -589,18 +589,15 @@ for (i = 0; i < 14; i++) {
     hours[i] = makeRect(canvas.width/20.0, 0.5, 0.5);
     hours[i] = transformObject(hours[i],-canvas.width/3,0,0);
     hours[i] = rotateObject(hours[i],hoursQuat);
+    hours[i].color="purple";
 }
 
-// hourAxis.color="red";
-hourAxis.color="black";
+hourAxis.color="red";
 minAxis.color="green";
-// secAxis.color="blue";
-secAxis.color="black";
+secAxis.color="blue";
 cube.color="yellow";
-// gnomon.color="purple";
-gnomon.color="black";
+gnomon.color="purple";
 shadow.color="black";
-hours.color="red";
 
 var debugTriangle=makeTriangle(100,100,100);
 debugTriangle.color="black";
@@ -628,6 +625,7 @@ function renderLoop() {
     // renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro)]));
     renderObj(hourAxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
     // renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), userQuat]));
+    renderObj(minAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
     renderObj(secAxis,quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro), inverseQuaternion(gyro), userQuat]));
 
     // quaternion rotations should be applied in opposite order

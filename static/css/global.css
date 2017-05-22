@@ -18,8 +18,9 @@ body, #page {
 	font-size: 18px;
 	line-height: 22px;
 	 
-    /* background-image: url("/media/gif/hollows-10.gif");*/
-    /* background-color: #FFFF00; */
+    /* background-image: url("/media/gif/hollows-10.gif"); */
+    /* background-color: #000000; */
+    background-color: #FFFFFF;
 
 	/*white-space:nowrap;*/
 	-webkit-font-smoothing: subpixel-antialiased;
