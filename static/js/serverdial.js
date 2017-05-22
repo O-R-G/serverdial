@@ -592,9 +592,9 @@ for (i = 0; i < 14; i++) {
     hours[i].color="purple";
 }
 
-hourAxis.color="red";
-minAxis.color="green";
-secAxis.color="blue";
+hourAxis.color="#FF0000";
+minAxis.color="#00CC00";
+secAxis.color="#0000FF";
 cube.color="yellow";
 gnomon.color="purple";
 shadow.color="black";
