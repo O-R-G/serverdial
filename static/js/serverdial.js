@@ -577,9 +577,9 @@ var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
 // gnomon
 
-var gnomon = gnomonWithAngle(latitude);
+var gnomon = gnomonWithLatitude(latitude);
 
-function gnomonWithAngle(thislatitude) {
+function gnomonWithLatitude(thislatitude) {
     // construct gnomon with angle = latitude
     // -90° < latitude < 90° (absolute value within range 0-360°)
     var angle = normalize(Math.abs(thislatitude),0,360);
