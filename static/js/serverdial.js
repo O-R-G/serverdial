@@ -60,7 +60,9 @@ function processGyro(alpha,beta,gamma) {
 // geolocation
 // https://www.w3schools.com/html/html5_geolocation.asp
 
-var display = document.getElementById("latitude");
+var display = document.getElementById("latitude");        
+var latitude = 56.1629;     // default to aarhus
+
 if (window.self) {
     getLocation();
 }
@@ -74,7 +76,9 @@ function getLocation() {
 }
 
 function showPosition(position) {
-    display.innerHTML = position.coords.latitude.toFixed(5) + "&deg;";
+    // latitude = position.coords.latitude.toFixed(4);
+    latitude = Math.random() * 90;
+    display.innerHTML = latitude + "&deg;";
 }
 
 function showError(error) {
@@ -415,7 +419,7 @@ function renderObj(obj,q) {
             if (debugFlag) {
                 // context.stroke();	// all
 		        if (k % 2 != 0) context.stroke();		    // points only
-	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
+	    	    if (k % 2 == 0) context.stroke();		    // spokes only
             } else {
 		        if (k % 2 != 0) context.stroke();		    // points only
 	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
@@ -571,14 +575,41 @@ var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
-var gnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
-var gnomonQuat = makeQuat(.2,.15,1,.2);
-gnomon = rotateObject(gnomon,gnomonQuat);
-gnomon = transformObject(gnomon,0,0,40);
+// gnomon
 
-var shadow = makeRect(canvas.width/2.25, 1.0, 0.0);
-var shadowQuat = makeQuat(0,0,1,.2);
-shadow = rotateObject(shadow,shadowQuat);
+var gnomon = gnomonWithAngle(latitude);
+
+function gnomonWithAngle(thislatitude) {
+    // construct gnomon with angle = latitude
+    // -90° < latitude < 90° (absolute value within range 0-360°)
+    var angle = normalize(Math.abs(thislatitude),0,360);
+    var gnomonQuat = makeQuat(0,angle,0,1); 
+    var thisgnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
+    thisgnomon = transformObject(thisgnomon,-canvas.width/4.0,0,0);
+    thisgnomon = rotateObject(thisgnomon,gnomonQuat);
+    thisgnomon = transformObject(thisgnomon,canvas.width/4.0,0,0);
+    return thisgnomon;
+}
+
+// shadow
+
+var shadow = shadowWithTime();
+
+function shadowWithTime() {
+    // update shadow based on current time
+    var d = new Date();
+    var seconds = ( (d.getHours() * 60 + d.getMinutes()) * 60) + d.getSeconds();
+    angle = map(seconds,0,86400,0,360);    
+    angle = normalize(angle,0,360); 
+    var shadowQuat = makeQuat(0,0,-1,angle); 
+    // alert(seconds + " : " + degrees);
+    var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
+    thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
+    thisshadow = rotateObject(thisshadow,shadowQuat);
+    thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+    return thisshadow;
+}
+
 
 // hours
 // tick marks could be added with points that are then rotated via quaternion which
@@ -612,6 +643,7 @@ function renderLoop() {
     // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
     context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
 
+    /*
     if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro))
     {
 	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
@@ -619,6 +651,7 @@ function renderLoop() {
 	    this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
 	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
     }
+    */
   
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
@@ -656,6 +689,7 @@ function renderLoop() {
 // renderLoop();
 
 renderTimer = window.setInterval(renderLoop, 1000/20);
+shadowTimer = window.setInterval(shadowWithTime, 1000/500);
  
 
 
@@ -669,4 +703,12 @@ renderTimer = window.setInterval(renderLoop, 1000/20);
 
 // 6. utility
 
+function normalize (val, min, max) {
+    // remap value to range [0-1] 
+    return (val - min) / (max - min); 
+}
 
+function map (value, currentmin, currentmax, targetmin, targetmax) {
+    // remap value to new range
+    return (value - currentmin) * ((targetmax-targetmin) / (currentmax-currentmin)) + targetmin;
+}

@@ -11,7 +11,7 @@ x hour lines
 + https:// ssl setup pair.com
 + geolocation
 + geolocation safari, desktop
-- draw hours as type logic
+/ draw hours as type logic
   understand vertex logic
 - gnomon angle (latitude)
   generate quaternion from euler angle based on latitude
