@@ -15,6 +15,7 @@
 var simulateGyro = true;    // for debug to turn off/on in console 
 var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
 
+
 function debug () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
 		document.getElementById('gyroInfo').style.visibility='visible';
@@ -100,8 +101,8 @@ var context = canvas.getContext('2d');
 context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
 context.canvas.height = window.innerHeight;
 context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
-// context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
-context.font = "20px Helvetica";      // this is used for canvas drwg if necc (numbers?)
+context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
+// context.font = "20px Helvetica";      // this is used for canvas drwg if necc (numbers?)
 context.fillStyle = "#EEE";
 
 
@@ -427,30 +428,34 @@ function renderObj(obj,q) {
 // or better, a property of the object
 
 function renderType(obj,q) {
-
+    
+    var thishour = 0;
 	var rotatedObj=rotateObject(obj,q);
 	// context.fillStyle = obj.color;
-	context.fillStyle = "#FF0000";
+	context.fillStyle = "purple";
 	
 	function scaleByZ(val,z) {
 		var focalLength=900; // [900] should probably be a global but oh well
-		var scale= focalLength/((-z)+focalLength);
+		var scale=focalLength/((-z)+focalLength);
 		return val*scale;
 	}
 	
 	for(var i=0 ; i<obj.vertices.length ; i+=3) {
-
-		for (var k=0;k<3;k++) {
-		  
+		// for (var k=0;k<3;k++) {
+		for (var k=0;k<1;k++) {
+		             
 			var vertexFrom=rotatedObj.vertices[i+k];
 		  	var temp=i+k+1;
 		  	if(k==2) 
 			  	temp=i;
 			  
 			var vertexTo = rotatedObj.vertices[temp];		
-            context.fillText(i,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
+            if (k % 2 == 0)
+                context.fillText(thishour,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 		}
-	}
+    }
+    // thishour++;
+    // thishour%=12;
 }
 
 
