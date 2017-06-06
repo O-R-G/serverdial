@@ -311,7 +311,7 @@ function makeRect(width,height,depth) {
 
 function makeTriangle(width,height,depth) {
 
-	// returns a 3D trianglelike object centered around the origin. 
+	// returns a 3D triangle-like object centered around the origin. 
 
 	var newObj={};
 	var hw=width/2;
@@ -393,6 +393,7 @@ function renderObj(obj,q) {
 	var rotatedObj=rotateObject(obj,q);
 	context.lineWidth = 1;
 	context.strokeStyle = obj.color;
+	context.fillColor = "purple";
 	
 	function scaleByZ(val,z) {
 		var focalLength=900; // [900] should probably be a global but oh well
@@ -400,7 +401,10 @@ function renderObj(obj,q) {
 		return val*scale;
 	}
 	
-	for(var i=0 ; i<obj.vertices.length ; i+=3) {
+    // to add filled shapes, wrap the dwg commands (context.moveTo(), .lineTo())
+    // with context.beginPath() to start and context.fill() to finish
+
+	for (var i=0 ; i<obj.vertices.length ; i+=3) {
 
 		for (var k=0;k<3;k++) {
 		  
@@ -414,18 +418,14 @@ function renderObj(obj,q) {
 
     		// original w/ focal length
 	    	context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
-		    context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
     		
-            // if (showInfo) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
+            if (k % 2 != 0)         // points only
+                context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
+            else if (showInfo)      // points and spokes
+                context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
 
-            if (showInfo) {
-                // context.stroke();	// all
-		        if (k % 2 != 0) context.stroke();		    // points only
-	    	    if (k % 2 == 0) context.stroke();		    // spokes only
-            } else {
-		        if (k % 2 != 0) context.stroke();		    // points only
-	    	    // if (k % 2 == 0) context.stroke();		    // spokes only
-            }
+            context.fill();
+            context.stroke();		    
 		}
 	}
 }

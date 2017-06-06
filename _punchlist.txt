@@ -7,7 +7,7 @@
 x three.js?
 x hour lines
 + https:// ssl setup localhost
-  https://gist.github.com/nrollr/4daba07c67adcb30693e
++ https://gist.github.com/nrollr/4daba07c67adcb30693e
 + https:// ssl setup pair.com
 + geolocation
 + geolocation safari, desktop
@@ -17,8 +17,10 @@ x hour lines
 + review quaternions
 + update shadow position *in process*
 + update shadow redrawing and debug
++ understand vertex logic
+/ fill triangles as shapes
 / draw hours as type logic
-  understand vertex logic
+- shadow blur transparent gradient
 - number layout (latitude)
   http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
