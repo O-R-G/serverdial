@@ -19,10 +19,13 @@ x hour lines
 + update shadow redrawing and debug
 + understand vertex logic
 / fill triangles as shapes
+/ shadow blur transparent gradient
 / draw hours as type logic
-- shadow blur transparent gradient
 - number layout (latitude)
   http://www.crbond.com/papers/sundial.pdf
+  see pp.4-5:
+  iterate 15° turns to get rotation angles from base of gnomon
+  then apply rotation to the hour ticks individually
 - sunrise / sunset
   determines when shadow shows or not
   use library? https://github.com/mourner/suncalc

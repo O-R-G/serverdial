@@ -391,9 +391,8 @@ function makeArcWithTriangle(width,height,depth) {
 function renderObj(obj,q) {
 
 	var rotatedObj=rotateObject(obj,q);
-	context.lineWidth = 1;
+	context.lineWidth = 0.5;    // [1.0]
 	context.strokeStyle = obj.color;
-	context.fillColor = "purple";
 	
 	function scaleByZ(val,z) {
 		var focalLength=900; // [900] should probably be a global but oh well
@@ -418,13 +417,20 @@ function renderObj(obj,q) {
 
     		// original w/ focal length
 	    	context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
-    		
-            if (k % 2 != 0)         // points only
+
+            // points only
+            if (k % 2 != 0)         
                 context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
-            else if (showInfo)      // points and spokes
+            
+            // points and spokes
+            else if (showInfo)      
                 context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
 
-            context.fill();
+            // not working, not sure why
+            // perhaps to do with the points in the wrong sequence?
+            // context.fillStyle = "blue";
+            // context.fill();
+
             context.stroke();		    
 		}
 	}
