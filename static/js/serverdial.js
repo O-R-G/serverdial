@@ -604,9 +604,9 @@ function shadowWithTime() {
     var shadowQuat = makeQuat(0,0,1,angle); 
     // alert(seconds + " : " + degrees);
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
-    // thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
-    thisshadow = rotateObject(thisshadow,shadowQuat);
     // thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+    thisshadow = rotateObject(thisshadow,shadowQuat);
+    // thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
     return thisshadow;
 }
 
