@@ -601,12 +601,12 @@ function shadowWithTime() {
     var seconds = ( (d.getHours() * 60 + d.getMinutes()) * 60) + d.getSeconds();
     angle = map(seconds,0,86400,0,360);    
     angle = normalize(angle,0,360); 
-    var shadowQuat = makeQuat(0,0,-1,angle); 
+    var shadowQuat = makeQuat(0,0,1,angle); 
     // alert(seconds + " : " + degrees);
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
-    thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
+    // thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
     thisshadow = rotateObject(thisshadow,shadowQuat);
-    thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+    // thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
     return thisshadow;
 }
 
@@ -643,6 +643,7 @@ function renderLoop() {
     // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
     context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
 
+    /*
     if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro))
     {
 	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
@@ -650,6 +651,7 @@ function renderLoop() {
 	    this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
 	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
     }
+    */
   
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
