@@ -13,27 +13,28 @@
 // 0. init, process gyro data, setup canvas
 
 var simulateGyro = true;    // for debug to turn off/on in console 
-var debugFlag = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
+var showInfo = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
+var debug = true;
 
 
-function debug () {
+function showInformation () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
 		document.getElementById('gyroInfo').style.visibility='visible';
 		document.getElementById('quatInfo').style.visibility='visible';
 		document.getElementById('mouseInfo').style.visibility='visible';
-		debugFlag = true;
+		showInfo = true;
 		return true;
 	} else {
 		document.getElementById('gyroInfo').style.visibility='hidden';
 		document.getElementById('quatInfo').style.visibility='hidden';
 		document.getElementById('mouseInfo').style.visibility='hidden';
-		debugFlag = false;
+		showInfo = false;
 		return false;
 	}
 }
 
-// document.addEventListener("click",debug);
-// document.addEventListener("touchStart",debug);
+// document.addEventListener("click",showInformation);
+// document.addEventListener("touchStart",showInformation);
 
 // gyroscope
 // get orientation info, rolling back if gyro info not available
@@ -76,8 +77,9 @@ function getLocation() {
 }
 
 function showPosition(position) {
-    // latitude = position.coords.latitude.toFixed(4);
-    latitude = Math.random() * 90;
+    latitude = position.coords.latitude.toFixed(4);
+    if (debug)
+        latitude = (Math.random() * 90).toFixed(4);
     display.innerHTML = latitude + "&deg;";
 }
 
@@ -414,9 +416,9 @@ function renderObj(obj,q) {
 	    	context.moveTo(scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 		    context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
     		
-            // if (debugFlag) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
+            // if (showInfo) context.strokeText(k,scaleByZ(vertexFrom[0],vertexFrom[2]), ( -scaleByZ(vertexFrom[1],vertexFrom[2])));
 
-            if (debugFlag) {
+            if (showInfo) {
                 // context.stroke();	// all
 		        if (k % 2 != 0) context.stroke();		    // points only
 	    	    if (k % 2 == 0) context.stroke();		    // spokes only
@@ -490,7 +492,7 @@ function touchStartFunc(e)
 {
 	prevTouchY=e.touches[0].clientY;
 	prevTouchX=e.touches[0].clientX;
-	debug();
+    showInformation();
 }
 
 function touchmoveFunc(e)
@@ -518,7 +520,7 @@ function mouseDownFunc(e)
 {
   prevTouchX = e.clientX;
   prevTouchY = e.clientY;
-  debug();
+  showInformation();
 }
 
 function mouseMoveFunc(e)
@@ -593,20 +595,22 @@ function gnomonWithLatitude(thislatitude) {
 
 // shadow
 
-var shadow = shadowWithTime();
+var degreelimit = 90;   // start and stop offset
+var shadow = shadowUpdate();
 
-function shadowWithTime() {
+function shadowUpdate() {
     // update shadow based on current time
-    var d = new Date();
-    var seconds = ( (d.getHours() * 60 + d.getMinutes()) * 60) + d.getSeconds();
-    angle = map(seconds,0,86400,0,360);    
-    angle = normalize(angle,0,360); 
-    var shadowQuat = makeQuat(0,0,1,angle); 
-    // alert(seconds + " : " + degrees);
+    // rotate around z-axis using quaternion from axis angle 
+    // not currently updating drawing live prob to do with redraw
+    var now = new Date();
+    var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
+    angle = map(seconds,0,86400,0,90);
+    if (debug) alert(seconds + " : " + angle);
+    var shadowQuat = quatFromAxisAngle(0,0,1,degToRad(angle));    
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
-    // thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+    thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
     thisshadow = rotateObject(thisshadow,shadowQuat);
-    // thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
+    thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
     return thisshadow;
 }
 
@@ -689,8 +693,9 @@ function renderLoop() {
 // renderLoop();
 
 renderTimer = window.setInterval(renderLoop, 1000/20);
-shadowTimer = window.setInterval(shadowWithTime, 1000/500);
- 
+// shadowTimer = window.setInterval(shadowUpdate, 1000);
+
+
 
 
 

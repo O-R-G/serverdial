@@ -11,13 +11,14 @@ x hour lines
 + https:// ssl setup pair.com
 + geolocation
 + geolocation safari, desktop
-/ draw hours as type logic
-  understand vertex logic
 + gnomon angle (latitude)
   generate quaternion from euler angle based on latitude
   use relative not absolute transformation in z
-/ update shadow position *in process*
-  review quaternions
++ review quaternions
++ update shadow position *in process*
+- update shadow does not redraw
+/ draw hours as type logic
+  understand vertex logic
 - number layout (latitude)
   http://www.crbond.com/papers/sundial.pdf
 - sunrise / sunset
