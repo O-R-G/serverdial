@@ -14,7 +14,7 @@
 
 var simulateGyro = true;    // for debug to turn off/on in console 
 var showInfo = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
-var debug = true;
+var debug = false;
 
 
 function showInformation () {
@@ -595,16 +595,17 @@ function gnomonWithLatitude(thislatitude) {
 
 // shadow
 
-var degreelimit = 90;   // start and stop offset
+var degreelimit = 90;               // offset to be based on latitude
+var speedlimit = 86400;             // for debug, larger is slower 
+                                    // [86400] is realtime
 var shadow = shadowUpdate();
 
 function shadowUpdate() {
     // update shadow based on current time
-    // rotate around z-axis using quaternion from axis angle 
-    // not currently updating drawing live prob to do with redraw
+    // rotate around z-axis using quaternion derived from axis angle 
     var now = new Date();
     var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
-    angle = map(seconds,0,86400,0,90);
+    angle = map(seconds,0,speedlimit,0,degreelimit);
     if (debug) alert(seconds + " : " + angle);
     var shadowQuat = quatFromAxisAngle(0,0,1,degToRad(angle));    
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
@@ -678,7 +679,8 @@ function renderLoop() {
     // the userQuat is what has been adjusted with touch or mouse events by user
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    renderObj(shadowUpdate(),quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     for (i = 0; i < hours.length; i++) {
         renderObj(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
@@ -693,7 +695,6 @@ function renderLoop() {
 // renderLoop();
 
 renderTimer = window.setInterval(renderLoop, 1000/20);
-// shadowTimer = window.setInterval(shadowUpdate, 1000);
 
 
 
