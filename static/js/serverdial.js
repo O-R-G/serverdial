@@ -623,9 +623,9 @@ var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
 // gnomon
 
-var gnomon = gnomonWithLatitude(latitude);
+var gnomon = updateGnomon(latitude);
 
-function gnomonWithLatitude(thislatitude) {
+function updateGnomon(thislatitude) {
     // construct gnomon with angle = latitude
     // -90° < latitude < 90° (absolute value within range 0-360°)
     var angle = normalize(Math.abs(thislatitude),0,360);
@@ -642,9 +642,9 @@ function gnomonWithLatitude(thislatitude) {
 var degreelimit = 90;               // offset to be based on latitude
 var speedlimit = 86400;             // for debug, larger is slower 
                                     // [86400] is realtime
-var shadow = shadowUpdate();
+var shadow = updateShadow();
 
-function shadowUpdate() {
+function updateShadow() {
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
     var now = new Date();
@@ -735,10 +735,10 @@ function renderLoop() {
     if (rendercount < latitude) 
         hours = updateHours(rendercount);
 
-    /* 
+    /*
     // animate gnomon
     if (rendercount < latitude) 
-        hours = updateHours(rendercount);
+        gnomon = updateGnomon(rendercount);
 
     // animate shadow
     if (rendercount < latitude) 
@@ -767,7 +767,7 @@ function renderLoop() {
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
     // renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(shadowUpdate(),quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    renderObj(updateShadow(),quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     for (i = 0; i < hours.length; i++) {
         renderObj(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
