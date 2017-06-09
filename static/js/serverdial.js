@@ -9,13 +9,12 @@
 // fonts -- either roman numerals or else data points for mtdbt2f numbers
 
 
-
 // 0. init, process gyro data, setup canvas
 
 var simulateGyro = true;    // for debug to turn off/on in console 
 var showInfo = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
-var debug = false;
-
+var rendercount = 0;
+var debug = true;
 
 function showInformation () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
@@ -63,6 +62,10 @@ function processGyro(alpha,beta,gamma) {
 
 var display = document.getElementById("latitude");        
 var latitude = 56.1629;     // default to aarhus
+// var latitude = 37.4300;     // debug value to match example
+                            // scoping problem with latitude as included only in callback
+                            // this may be solved using an anon function or other callback wrapper
+                            // for now leaving as is ** fix **
 
 if (window.self) {
     getLocation();
@@ -70,13 +73,13 @@ if (window.self) {
 
 function getLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(setPosition, showError);
     } else {
         display.innerHTML = "Geolocation not supported in this browser.";
     }
 }
 
-function showPosition(position) {
+function setPosition(position) {
     latitude = position.coords.latitude.toFixed(4);
     if (debug)
         latitude = (Math.random() * 90).toFixed(4);
@@ -184,6 +187,11 @@ function degToRad(deg) {
 	 return deg * Math.PI / 180; 
 }
 
+function radToDeg(rad) {
+
+	 return rad * 180 / Math.PI;
+}
+
 function makeQuat(x,y,z,w) {
 
 	return  {"x":x,"y":y,"z":z,"w":w};
@@ -199,6 +207,7 @@ function quatFromAxisAngle(x,y,z,angle) {
 	q.w = Math.cos(half_angle);
 	return q;
 }
+
 
 function rotateObject(obj,q) {
 
@@ -247,6 +256,35 @@ function transformObject(obj,x,y,z) {
 
 	// return obj;
 	return newObj;
+}
+
+function calculateHourAngles(thislatitude, start) {
+
+    // find the angles of offset from gnomon for hour ticks
+    // return object with two arrays of angle values in radians
+    // morning and afternoon ordered by offset from 12pm
+    // based on http://www.crbond.com/papers/sundial.pdf
+    // atan takes a value (ratio) and returns an angle in radians
+    // sin, tan take an angle in radians return a value (ratio)
+    
+    var angleincrement = 15;
+    var hourangles={};
+    hourangles.morning=[];
+    hourangles.afternoon=[];
+    hourangles.count = (12 - start);
+
+	for(var i = 0; i < hourangles.count; i++) {        
+        var morning = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(-angleincrement)));
+        var afternoon = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(angleincrement)));
+        hourangles.morning.push(morning);
+        hourangles.afternoon.push(afternoon);
+        angleincrement += 15;
+    }
+
+    if (debug)
+        console.log(hourangles.morning);
+
+	return hourangles;
 }
 
 
@@ -612,7 +650,7 @@ function shadowUpdate() {
     var now = new Date();
     var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
     angle = map(seconds,0,speedlimit,0,degreelimit);
-    if (debug) alert(seconds + " : " + angle);
+    if (debug) // alert(seconds + " : " + angle);
     var shadowQuat = quatFromAxisAngle(0,0,1,degToRad(angle));    
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
     thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
@@ -621,23 +659,52 @@ function shadowUpdate() {
     return thisshadow;
 }
 
-
 // hours
-// tick marks could be added with points that are then rotated via quaternion which
-// is the z axis and rotation (w) is whatever it should be between 0 and 1 normalized
-// maybe use the degree radian conversion
 
-var hours = [];
-var degreeoffset = -110;
-for (i = 0; i < 14; i++) {
-    // rotate around z axis every 15° 
-    // (and then adjusted by latitude as per sundial.pdf)
-    var hoursQuat = quatFromAxisAngle(0,0,1,degToRad(i * 15 + degreeoffset));
-    hours[i] = makeRect(canvas.width/20.0, 0.5, 0.5);
-    hours[i] = transformObject(hours[i],-canvas.width/3,0,0);
-    hours[i] = rotateObject(hours[i],hoursQuat);
-    hours[i].color="purple";
+var hours = updateHours(latitude);
+
+function updateHours(thislatitude) {
+
+    // build hourangles object with two arrays for morning and afternoon
+    // use hourangles to draw and rotate ticks
+    // rotate around z axis based on hourangles starting from 12pm 
+    // and working out by morning and afternoon        
+
+    var hourstart = 7;
+    var hourangles = calculateHourAngles(thislatitude, hourstart); 
+    var hours = [];
+    var degreeoffset = -110;
+
+    // noon
+    var thishourquat = quatFromAxisAngle(0,0,1,0);
+    var thishour = makeRect(canvas.width/20.0, 0.5, 0.5);
+    thishour = transformObject(thishour,-canvas.width/3,0,0);
+    thishour = rotateObject(thishour,thishourquat);    
+    thishour.color="green";
+    hours.push(thishour);
+
+    for (i = 0; i < hourangles.count; i++) {
+
+        // morning
+        var thishourquat = quatFromAxisAngle(0,0,1,hourangles.morning[i]);
+        var thishour = makeRect(canvas.width/20.0, 0.5, 0.5);
+        thishour = transformObject(thishour,-canvas.width/3,0,0);
+        thishour = rotateObject(thishour,thishourquat);
+        thishour.color="red";
+        hours.push(thishour);
+
+        // afternoon
+        var thishourquat = quatFromAxisAngle(0,0,1,hourangles.afternoon[i]);
+        var thishour = makeRect(canvas.width/20.0, 0.5, 0.5);
+        thishour = transformObject(thishour,-canvas.width/3,0,0);
+        thishour = rotateObject(thishour,thishourquat);
+        thishour.color="blue";
+        hours.push(thishour);
+    }
+
+    return hours;
 }
+
 
 hourAxis.color="#FF0000";
 minAxis.color="#00CC00";
@@ -654,6 +721,7 @@ function renderLoop() {
     // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
     context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
 
+    if (debug) {
     if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro))
     {
 	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
@@ -661,7 +729,22 @@ function renderLoop() {
 	    this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
 	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
     }
-  
+    }
+
+    // animate hours
+    if (rendercount < latitude) 
+        hours = updateHours(rendercount);
+
+    /* 
+    // animate gnomon
+    if (rendercount < latitude) 
+        hours = updateHours(rendercount);
+
+    // animate shadow
+    if (rendercount < latitude) 
+        hours = updateHours(rendercount);
+    */
+
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     // renderObj(hourAxis,inverseQuaternion(gyro));
@@ -692,6 +775,8 @@ function renderLoop() {
     }
 
     // renderObj(debugTriangle, userQuat);
+
+    rendercount ++;
 }
 
 // using setInterval instead of manual approach suggested

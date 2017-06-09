@@ -21,11 +21,15 @@ x hour lines
 / fill triangles as shapes
 / shadow blur transparent gradient
 / draw hours as type logic
-- number layout (latitude)
++ number layout (latitude)
   http://www.crbond.com/papers/sundial.pdf
   see pp.4-5:
   iterate 15° turns to get rotation angles from base of gnomon
   then apply rotation to the hour ticks individually
+- var latitude scope and callback
+- debug debug flag   
+
+- check gnomon angle logic -- not sure it is correct
 - sunrise / sunset
   determines when shadow shows or not
   use library? https://github.com/mourner/suncalc
