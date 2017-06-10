@@ -31,11 +31,12 @@ x hour lines
 
 + gnomon angle logic
 + animate gnomon
-- animate shadow
-- animate fake gyro data
++ animate shadow
++ animate fake gyro data
+
 - gnomon always starts pointing north
     https://www.w3schools.com/html/html5_geolocation.asp
-
+  and rotated to correct orientation
 - var latitude scope and callback
 - debug debug flag   
 

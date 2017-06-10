@@ -15,7 +15,7 @@
 var simulateGyro = true;    // for debug to turn off/on in console 
 var showInfo = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
 var rendercount = 0;
-var fakegyro = true;
+var fakegyro = false;
 var animate = true;
 var debug = true;
 
@@ -284,8 +284,7 @@ function calculateHourAngles(thislatitude, start) {
         angleincrement += 15;
     }
 
-    if (debug)
-        console.log(hourangles.morning);
+    // if (debug) console.log(hourangles.morning);
 
 	return hourangles;
 }
@@ -632,9 +631,10 @@ var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
     var gnomon = updateGnomon(latitude);
 
 function updateGnomon(thislatitude) {
+
     // construct gnomon with angle = latitude
     // -90° < latitude < 90° (absolute value within range 0-90°)
-    // var angle = normalize(Math.abs(thislatitude),0,360);
+
     var angle = Math.abs(thislatitude);
     var thisgnomonquat = quatFromAxisAngle(0,1,0,degToRad(angle));    
     var thisgnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
@@ -649,21 +649,26 @@ function updateGnomon(thislatitude) {
 
 var degreelimit = 90;               // offset to be based on latitude
 var speedlimit = 86400;             // for debug, larger is slower 
+// var speedlimit = 86;             // for debug, larger is slower 
                                     // [86400] is realtime
-var shadow = updateShadow();
 
-function updateShadow() {
+var shadow = updateShadow(new Date());
+
+function updateShadow(seconds) {
+
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
-    var now = new Date();
-    var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
+
+    // var now = new Date();
+    // var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
     angle = map(seconds,0,speedlimit,0,degreelimit);
-    if (debug) // alert(seconds + " : " + angle);
-    var shadowQuat = quatFromAxisAngle(0,0,1,degToRad(angle));    
+    var shadowquat = quatFromAxisAngle(0,0,1,degToRad(angle));    
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
     thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
-    thisshadow = rotateObject(thisshadow,shadowQuat);
+    thisshadow = rotateObject(thisshadow,shadowquat);
     thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+
+    // if (debug) console.log(seconds + " : " + angle);
 
     return thisshadow;
 }
@@ -727,17 +732,11 @@ debugTriangle.color="black";
 
 function renderLoop() {
 
+    var now = new Date();
+    var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
+
     // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
     context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
-
-    if (fakegyro) {
-        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
-    	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
-	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
-	        this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
-    	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
-        }
-    }
 
     // animate hours
     if (rendercount < latitude && animate) 
@@ -747,10 +746,22 @@ function renderLoop() {
     if (rendercount < latitude && animate) 
         gnomon = updateGnomon(rendercount);
 
-    /*
     // animate shadow
-    if (rendercount < latitude) 
-        hours = updateHours(rendercount);
+    if (rendercount*1500 < seconds && animate) 
+        shadow = updateShadow(rendercount*1500);
+    else 
+        shadow = updateShadow(seconds);
+
+    /*
+    // animate gryo
+    if ((rendercount < latitude) || fakegyro) {
+        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
+    	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
+	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
+	        this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
+    	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+        }
+    }
     */
 
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
@@ -775,7 +786,9 @@ function renderLoop() {
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
     // renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(updateShadow(),quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(updateShadow(now),quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    // renderObj(updateShadow(seconds),quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     for (i = 0; i < hours.length; i++) {
         renderObj(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
