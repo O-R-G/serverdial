@@ -775,7 +775,6 @@ function renderLoop() {
     else 
         shadow = updateShadow(seconds);
 
-    /*
     // animate gryo
     if ((rendercount < latitude) || fakegyro) {
         if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
@@ -785,7 +784,6 @@ function renderLoop() {
     	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
         }
     }
-    */
 
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
