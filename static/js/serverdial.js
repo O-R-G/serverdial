@@ -1,4 +1,3 @@
-
 // adapted from http://www.asterixcreative.com/blog-mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-pt1.html
 
 // serverdial is simply a computer model of a future sundial
@@ -15,7 +14,7 @@
 var simulateGyro = true;    // for debug to turn off/on in console 
 var showInfo = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
 var rendercount = 0;
-var fakegyro = false;
+var fakegyro = true;
 var animate = true;
 var debug = true;
 
@@ -64,8 +63,8 @@ function processGyro(alpha,beta,gamma) {
 // https://www.w3schools.com/html/html5_geolocation.asp
 
 var display = document.getElementById("latitude");        
-// var latitude = 56.1629;     // default to aarhus
-var latitude = 37.4300;     // debug value to match example
+var latitude = 56.1629;     // default to aarhus
+// var latitude = 37.4300;     // debug value to match example
                             // scoping problem with latitude as included only in callback
                             // this may be solved using an anon function or other callback wrapper
                             // for now leaving as is ** fix **
@@ -84,8 +83,8 @@ function getLocation() {
 
 function setPosition(position) {
     latitude = position.coords.latitude.toFixed(4);
-    if (debug)
-        latitude = (Math.random() * 90).toFixed(4);
+    // if (debug)
+    //    latitude = (Math.random() * 90).toFixed(4);
     display.innerHTML = latitude + "&deg;";
 }
 
@@ -289,6 +288,26 @@ function calculateHourAngles(thislatitude, start) {
 	return hourangles;
 }
 
+function calculateShadowAngle(thislatitude, now) {
+
+    // find the angle of offset for the shadow based on current time
+    // where now is currenttime in seconds and is mapped into range 0-360°
+    // morning and afternoon can animate separately from 12pm
+    // return object with current value in radians and am/pm flag
+    // based on http://www.crbond.com/papers/sundial.pdf
+    // atan takes a value (ratio) and returns an angle in radians
+    // sin, tan take an angle in radians return a value (ratio)
+
+    var thisshadowangle={};
+    var omega = map(now,0,86400,0,360);
+    if (omega < 180)
+        thisshadowangle.am = true;
+    thisshadowangle.radians = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(omega)));
+
+    // if (debug) console.log(hourangles.morning);
+
+	return thisshadowangle;
+}
 
 
 
@@ -654,15 +673,18 @@ var speedlimit = 86400;             // for debug, larger is slower
 
 var shadow = updateShadow(new Date());
 
-function updateShadow(seconds) {
+function updateShadow(now) {
+
 
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
 
-    // var now = new Date();
-    // var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
-    angle = map(seconds,0,speedlimit,0,degreelimit);
-    var shadowquat = quatFromAxisAngle(0,0,1,degToRad(angle));    
+    // angle = map(seconds,0,speedlimit,0,degreelimit);
+    // var shadowquat = quatFromAxisAngle(0,0,1,degToRad(angle));    
+
+    shadowangle = calculateShadowAngle(latitude, now);
+    var shadowquat = quatFromAxisAngle(0,0,1,shadowangle.radians);    
+
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
     thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
     thisshadow = rotateObject(thisshadow,shadowquat);
@@ -687,7 +709,6 @@ function updateHours(thislatitude) {
     var hourstart = 7;
     var hourangles = calculateHourAngles(thislatitude, hourstart); 
     var hours = [];
-    var degreeoffset = -110;
 
     // noon
     var thishourquat = quatFromAxisAngle(0,0,1,0);
@@ -752,7 +773,6 @@ function renderLoop() {
     else 
         shadow = updateShadow(seconds);
 
-    /*
     // animate gryo
     if ((rendercount < latitude) || fakegyro) {
         if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
@@ -762,7 +782,6 @@ function renderLoop() {
     	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
         }
     }
-    */
 
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
