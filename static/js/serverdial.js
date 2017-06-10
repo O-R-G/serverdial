@@ -675,16 +675,18 @@ var shadow = updateShadow(new Date());
 
 function updateShadow(now) {
 
-
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
 
+    // ** old **  delete
     // angle = map(seconds,0,speedlimit,0,degreelimit);
     // var shadowquat = quatFromAxisAngle(0,0,1,degToRad(angle));    
 
     shadowangle = calculateShadowAngle(latitude, now);
-    var shadowquat = quatFromAxisAngle(0,0,1,shadowangle.radians);    
-
+    // var shadowquat = quatFromAxisAngle(0,0,1,shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
+    var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
+                                                                        // as per sundial.pdf paper
+                                                                        // negative value? why? unsure ... ** fix **
     var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
     thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
     thisshadow = rotateObject(thisshadow,shadowquat);
@@ -773,6 +775,7 @@ function renderLoop() {
     else 
         shadow = updateShadow(seconds);
 
+    /*
     // animate gryo
     if ((rendercount < latitude) || fakegyro) {
         if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
@@ -782,6 +785,7 @@ function renderLoop() {
     	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
         }
     }
+    */
 
     // renderObj(cube,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
