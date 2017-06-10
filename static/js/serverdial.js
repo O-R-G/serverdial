@@ -1,3 +1,4 @@
+
 // adapted from http://www.asterixcreative.com/blog-mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-pt1.html
 
 // serverdial is simply a computer model of a future sundial
@@ -14,6 +15,8 @@
 var simulateGyro = true;    // for debug to turn off/on in console 
 var showInfo = false;	// ** fix ** there is a better logic to this than using global i think in the addEventListener callback
 var rendercount = 0;
+var fakegyro = true;
+var animate = true;
 var debug = true;
 
 function showInformation () {
@@ -61,8 +64,8 @@ function processGyro(alpha,beta,gamma) {
 // https://www.w3schools.com/html/html5_geolocation.asp
 
 var display = document.getElementById("latitude");        
-var latitude = 56.1629;     // default to aarhus
-// var latitude = 37.4300;     // debug value to match example
+// var latitude = 56.1629;     // default to aarhus
+var latitude = 37.4300;     // debug value to match example
                             // scoping problem with latitude as included only in callback
                             // this may be solved using an anon function or other callback wrapper
                             // for now leaving as is ** fix **
@@ -623,17 +626,22 @@ var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
 // gnomon
 
-var gnomon = updateGnomon(latitude);
+// if (animate)
+//    var gnomon = updateGnomon(0);
+// else 
+    var gnomon = updateGnomon(latitude);
 
 function updateGnomon(thislatitude) {
     // construct gnomon with angle = latitude
-    // -90° < latitude < 90° (absolute value within range 0-360°)
-    var angle = normalize(Math.abs(thislatitude),0,360);
-    var gnomonQuat = makeQuat(0,angle,0,1); 
+    // -90° < latitude < 90° (absolute value within range 0-90°)
+    // var angle = normalize(Math.abs(thislatitude),0,360);
+    var angle = Math.abs(thislatitude);
+    var thisgnomonquat = quatFromAxisAngle(0,1,0,degToRad(angle));    
     var thisgnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
     thisgnomon = transformObject(thisgnomon,-canvas.width/4.0,0,0);
-    thisgnomon = rotateObject(thisgnomon,gnomonQuat);
+    thisgnomon = rotateObject(thisgnomon,thisgnomonquat);
     thisgnomon = transformObject(thisgnomon,canvas.width/4.0,0,0);
+
     return thisgnomon;
 }
 
@@ -656,6 +664,7 @@ function updateShadow() {
     thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
     thisshadow = rotateObject(thisshadow,shadowQuat);
     thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+
     return thisshadow;
 }
 
@@ -721,25 +730,24 @@ function renderLoop() {
     // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
     context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
 
-    if (debug) {
-    if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro))
-    {
-	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
-	    this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
-	    this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
-	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
-    }
+    if (fakegyro) {
+        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
+    	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
+	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
+	        this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
+    	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+        }
     }
 
     // animate hours
-    if (rendercount < latitude) 
+    if (rendercount < latitude && animate) 
         hours = updateHours(rendercount);
 
-    /*
     // animate gnomon
-    if (rendercount < latitude) 
+    if (rendercount < latitude && animate) 
         gnomon = updateGnomon(rendercount);
 
+    /*
     // animate shadow
     if (rendercount < latitude) 
         hours = updateHours(rendercount);

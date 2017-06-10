@@ -12,7 +12,7 @@ $title = "serverdial.org";
 		<link rel="stylesheet" href="static/css/global.css">
 		<link rel="stylesheet" href="static/css/sf-text.css">
 		<link rel="apple-touch-icon" href="media/png/touchicon.png" />
-		<script src="static/js/analytics.js"></script>
+		<!-- <script src="static/js/analytics.js"></script> -->
 	</head>
 	<body>
 		<div id="page">
