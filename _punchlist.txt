@@ -33,15 +33,19 @@ x hour lines
 + animate shadow
 + animate fake gyro data
 
-/ shadow logic
-
-- gnomon always starts pointing north
-    https://www.w3schools.com/html/html5_geolocation.asp
+/ gnomon always starts pointing north
   and rotated to correct orientation
-- var latitude scope and callback
-- debug debug flag   
-
+  need to work out order of transformations and correct naming
+  should not be updateHeadingNorth
+  but should apply to gnomon and to hours
+  essentially should be a global transform but has to be in proper order
+  
 - sunrise / sunset
   determines when shadow shows or not
   use library? https://github.com/mourner/suncalc
+
+/ shadow logic
+- var latitude scope and callback
+- debug debug flag   
+
 - google analytics turn on

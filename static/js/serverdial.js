@@ -16,6 +16,7 @@ var showInfo = false;	// ** fix ** there is a better logic to this than using gl
 var rendercount = 0;
 var fakegyro = true;
 var animate = true;
+var animategyro = false;
 var debug = true;
 
 function showInformation () {
@@ -68,6 +69,7 @@ var latitude = 56.1629;     // default to aarhus
                             // scoping problem with latitude as included only in callback
                             // this may be solved using an anon function or other callback wrapper
                             // for now leaving as is ** fix **
+var headingnorth;           // heading as degrees clockwise from north (returned if available)
 
 if (window.self) {
     getLocation();
@@ -82,7 +84,14 @@ function getLocation() {
 }
 
 function setPosition(position) {
+    // in this callback function, need to trigger other actions from this once position info is ready
+    // double callback?
     latitude = position.coords.latitude.toFixed(4);
+    if (position.coords.heading)
+        headingnorth = position.coords.heading.toFixed(4);      // only returns if available
+    else
+        headingnorth = 13.001;      // stub value debug                            
+        // headingnorth = 0;        // real value
     // if (debug)
     //    latitude = (Math.random() * 90).toFixed(4);
     display.innerHTML = latitude + "&deg;";
@@ -480,10 +489,12 @@ function renderObj(obj,q) {
             // points only
             if (k % 2 != 0)         
                 context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
-            
+
+            /*
             // points and spokes
             else if (showInfo)      
                 context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
+            */
 
             // not working, not sure why
             // perhaps to do with the points in the wrong sequence?
@@ -644,10 +655,8 @@ var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
 // gnomon
 
-// if (animate)
-//    var gnomon = updateGnomon(0);
-// else 
-    var gnomon = updateGnomon(latitude);
+var gnomon = updateGnomon(latitude);
+// gnomon = updateHeadingNorth(gnomon, headingnorth, canvas.width/4.0);
 
 function updateGnomon(thislatitude) {
 
@@ -668,8 +677,7 @@ function updateGnomon(thislatitude) {
 
 var degreelimit = 90;               // offset to be based on latitude
 var speedlimit = 86400;             // for debug, larger is slower 
-// var speedlimit = 86;             // for debug, larger is slower 
-                                    // [86400] is realtime
+// var speedlimit = 86;             // for debug, larger is slower                                     // [86400] is realtime
 
 var shadow = updateShadow(new Date());
 
@@ -742,6 +750,18 @@ function updateHours(thislatitude) {
     return hours;
 }
 
+function updateHeadingNorth(thisobject, thisheading, thisoffsetx) {
+
+    // takes a 3d object and performs orientation in relation to north
+    // uses geolocation if available and otherwise defaults to 0° offset
+
+    var thisquat = quatFromAxisAngle(0,0,1,degToRad(thisheading));    
+    thisobject = transformObject(thisobject,-thisoffsetx,0,0);
+    thisobject = rotateObject(thisobject,thisquat);
+    thisobject = transformObject(thisobject,thisoffsetx,0,0);
+    console.log(thisheading);
+    return thisobject;
+}
 
 hourAxis.color="#FF0000";
 minAxis.color="#00CC00";
@@ -752,6 +772,8 @@ shadow.color="black";
 
 var debugTriangle=makeTriangle(100,100,100);
 debugTriangle.color="black";
+
+
 
 function renderLoop() {
 
@@ -775,13 +797,15 @@ function renderLoop() {
     else 
         shadow = updateShadow(seconds);
 
-    // animate gryo
-    if ((rendercount < latitude) || fakegyro) {
-        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
-    	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
-	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
-	        this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
-    	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+    if (animategyro) {
+        // animate gryo
+        if ((rendercount < latitude) || fakegyro) {
+            if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulateGyro)) {
+    	        this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
+	            this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
+	            this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
+    	        processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+            }
         }
     }
 
