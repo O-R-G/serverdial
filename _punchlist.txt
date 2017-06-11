@@ -32,8 +32,17 @@ x hour lines
 + animate gnomon
 + animate shadow
 + animate fake gyro data
++ sunrise / sunset
+  determines when shadow shows or not
+  use https://github.com/mourner/suncalc
 
-- callback get latitude logic, timing, etc
+/ shadow logic
+    currently uses a date object, not a value! ** fix **
+
+- callback get latitude logic, timing, checkSun 
+  certain things need to happen before others
+  include init() function to trigger all else?
+  or init() and start()
 - var latitude scope and callback
 
 / gnomon always starts pointing north
@@ -42,15 +51,7 @@ x hour lines
   should not be updateHeadingNorth
   but should apply to gnomon and to hours
   essentially should be a global transform but has to be in proper order
-  
-/ sunrise / sunset
-  determines when shadow shows or not
-  use library? https://github.com/mourner/suncalc
 
-    how should i include the library?
-    in html or in js?
-
-/ shadow logic
-- debug debug flag   
+- debug debug flag
 
 - google analytics turn on

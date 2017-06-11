@@ -656,6 +656,10 @@ var minAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var secAxis=makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 var cube=makeRect(canvas.width/5,canvas.width/5,canvas.width/5);
 
+// check if between sunrise and sunset
+
+var sun = checkSun(new Date(), latitude);
+
 // gnomon
 
 var gnomon = updateGnomon(latitude);
@@ -877,17 +881,25 @@ function map (value, currentmin, currentmax, targetmin, targetmax) {
     return (value - currentmin) * ((targetmax-targetmin) / (currentmax-currentmin)) + targetmin;
 }
 
+function checkSun (now, thislatitude) {
 
-// 7. dev sunrise sunset
+    // using suncalc library to get sunrise and sunset based on latitude
+    var times = SunCalc.getTimes(now, thislatitude, -0.1);
+    var sunrise = times.sunrise;
+    var sunset = times.sunset;
+    if (sunrise < now && now < sunset)
+        sun = true;
+    else 
+        sun = false;
 
-// var times = SunCalc.getTimes(new Date(), latitude, -0.1);
-var times = SunCalc.getTimes(new Date(), 51.3, -0.1);
-var sunrise = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
-var sunset = times.sunset.getHours() + ':' + times.sunset.getMinutes();
+    if (debug) {
+        console.log(sunrise);
+        console.log(now);
+        console.log(sunset);
+        console.log(sun);
+    }
 
-console.log("+++++++++++");
-console.log(times);
-console.log(sunrise);
-console.log(sunset);
+    return sun;
+}
 
 
