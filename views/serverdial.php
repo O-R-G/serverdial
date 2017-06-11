@@ -53,5 +53,6 @@
 
 <canvas id="gyroCanvas"></canvas>
 
+<script src='static/js/suncalc/suncalc.js'></script>
 <script src='static/js/serverdial.js'></script>
 

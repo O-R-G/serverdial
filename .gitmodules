@@ -1,0 +1,3 @@
+[submodule "static/js/suncalc"]
+	path = static/js/suncalc
+	url = https://github.com/mourner/suncalc.git

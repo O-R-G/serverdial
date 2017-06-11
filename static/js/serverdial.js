@@ -1,4 +1,7 @@
 // adapted from http://www.asterixcreative.com/blog-mobile-gyroscope-with-javascript-and-quaternions-programming-tutorial-pt1.html
+// uses suncalc, a js library https://github.com/mourner/suncalc for sunrise, sunset calculations
+
+// ** better to use this directly here or in the html and feed it to this script????? **
 
 // serverdial is simply a computer model of a future sundial
 // specific to the exact geolocation and gyroscope of the device used to view it
@@ -873,3 +876,18 @@ function map (value, currentmin, currentmax, targetmin, targetmax) {
     // remap value to new range
     return (value - currentmin) * ((targetmax-targetmin) / (currentmax-currentmin)) + targetmin;
 }
+
+
+// 7. dev sunrise sunset
+
+// var times = SunCalc.getTimes(new Date(), latitude, -0.1);
+var times = SunCalc.getTimes(new Date(), 51.3, -0.1);
+var sunrise = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
+var sunset = times.sunset.getHours() + ':' + times.sunset.getMinutes();
+
+console.log("+++++++++++");
+console.log(times);
+console.log(sunrise);
+console.log(sunset);
+
+
