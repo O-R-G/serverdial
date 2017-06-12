@@ -18,8 +18,8 @@ var rendercount = 0;
 var debug = true;
 
 var display = document.getElementById("latitude");
-var latitude = 56.1629;     // default to aarhus
-var headingnorth = 0.0;           
+var latitude;     
+var headingnorth;           
     
 var canvas;
 var context;
@@ -102,7 +102,7 @@ function init () {
 
 function setup () {
 
-    if (!latitude) latitude = 56.1629;
+    if (!latitude) latitude = 56.1629;          // default to aarhus
     if (!headingnorth) headingnorth = 13.000;
 
     // sun?
@@ -501,14 +501,14 @@ function updateGnomon(thislatitude) {
     return thisgnomon;
 }
 
-function updateShadow(now) {
+function updateShadow(now, thislatitude) {
 
     // ** fix ** currently using date object and not getting seconds! 
     // how is it working???
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
 
-    shadowangle = calculateShadowAngle(latitude, now);
+    shadowangle = calculateShadowAngle(thislatitude, now);
     // var shadowquat = quatFromAxisAngle(0,0,1,shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
     var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
                                                                         // as per sundial.pdf paper
@@ -663,9 +663,9 @@ function renderLoop() {
 
     // animate shadow
     if (rendercount*1500 < seconds && animate) 
-        shadow = updateShadow(rendercount*1500);
+        shadow = updateShadow(rendercount*1500, latitude);
     else 
-        shadow = updateShadow(seconds);
+        shadow = updateShadow(seconds, latitude);
 
     // animate gryo
     if ((rendercount < latitude)) {

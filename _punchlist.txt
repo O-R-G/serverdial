@@ -37,22 +37,21 @@ x hour lines
   use https://github.com/mourner/suncalc
 + init(), setup(), start()
 + callback get latitude logic, timing, checkSun 
++ var latitude scope, thislatitude 
 
-- var latitude scope, thislatitude etc -- prob just use a global?
+- debug debug flag
 
 / shadow logic
     currently uses a date object, not a value! ** fix **
 
 - init() on document load in html
 - load suncalc.js check?
-
 - css load animation
   https://codepen.io/rusjames/pen/uAFhE
   http://jsfiddle.net/leaverou/y8kNx/
   Loading ...
   Getting latitude
   Latitude found, etc.
-- debug debug flag
 
 / gnomon always starts pointing north
   and rotated to correct orientation
@@ -61,4 +60,4 @@ x hour lines
   but should apply to gnomon and to hours
   essentially should be a global transform but has to be in proper order
 
-- google analytics turn on
+- google analytics
