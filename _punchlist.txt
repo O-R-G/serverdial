@@ -48,14 +48,21 @@ x hour lines
 + redirect all http:// to https:// (.htaccess?)
   https://stackoverflow.com/questions/16200501/http-to-https-apache-redirection
 + update and headingnorth logic
-x gnomon should always start pointing north
-  impossible as coords.heading does not yet work in ios safari
 + colors (hours.colors, background, etc) hollows?
+x gnomon should always start pointing north
+  coords.heading does not yet work in ios safari
+    but this is a possibility:
+    https://stackoverflow.com/questions/16048514/can-i-use-javascript-to-get-the-compass-heading-for-ios-and-android
+    https://richtr.github.io/Marine-Compass/
++ loading sequence
+  use numbers in rendercount to trigger sequential events
 
-- fix hours distribution for more than 11
+/ fix hours distribution for more than 11
+  problem with trigonometry?
+  look at calculate shadow angles also -- probably a clue there
+  review sundial.pdf
+
 - implement sun or no sun
-- loading sequence
-
 - requestAnimationFrame() ?
 - google analytics
  

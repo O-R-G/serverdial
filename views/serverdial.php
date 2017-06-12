@@ -47,13 +47,15 @@
 </div>
     
 <div id="quatInfo">
-	&Alpha;: <span id="alpha"></span><br />
-	&Beta;: <span id="beta"></span><br />
-	&Gamma;: <span id="gamma"></span><br />
+	&alpha;: <span id="alpha"></span><br />
+	&beta;: <span id="beta"></span><br />
+	&gamma;: <span id="gamma"></span><br />
+    <!--
 	x: <span id="x">x</span><br />
 	y: <span id="y">y</span><br />
 	z: <span id="z">z</span><br />
 	w: <span id="w">w</span><br /> 
+    -->
 </div>
     
 <div id="geoInfo">

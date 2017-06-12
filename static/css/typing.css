@@ -4,19 +4,18 @@
 
 #status {
     /* specify position in global.css */
-
-  background-color: #FF0;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 300px;
-  animation: type 1s steps(60, end); 
+    /* background-color: #FFF; */  
+    white-space: nowrap;
+    overflow: hidden;
+    width: 300px;
+    animation: type 1s steps(60, end); 
 }
 
 #status:nth-child(2){
   animation: type2 2s steps(60, end);
 }
 
-#status > #cursor {
+#cursor {
   animation: cursorblink 1s infinite;
 }
 

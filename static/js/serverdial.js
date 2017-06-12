@@ -91,8 +91,6 @@ function init () {
     context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
     // context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
     context.fillStyle = "#EEE";
-
-    document.getElementById("status").innerHTML = "Finding geolocation ... <span id='cursor'>|<span>";
 }
 
 function setup () {
@@ -119,8 +117,6 @@ function setup () {
     gnomon.color = "#009999";
     hours.color = "#00FF00";
 
-    document.getElementById("status").innerHTML = "setup() ... <span id='cursor'>|<span>";
-
     if (window.self)
         start();
 }
@@ -128,7 +124,6 @@ function setup () {
 function start () {
 
     renderTimer = window.setInterval(renderLoop, 1000/20);
-    document.getElementById("status").innerHTML = "Searching . . . <span id='cursor'>|<span>";
 }
 
 
@@ -356,7 +351,7 @@ function transformObject(obj,x,y,z) {
 	return newObj;
 }
 
-function calculateHourAngles(thislatitude, start) {
+function calculateHourAngles(thislatitude, thisstarthour) {
 
     // find the angles of offset from gnomon for hour ticks
     // return object with two arrays of angle values in radians
@@ -366,23 +361,30 @@ function calculateHourAngles(thislatitude, start) {
     // sin, tan take an angle in radians return a value (ratio)
     
     var angleincrement = 15;
-    var hourangles={};
-    hourangles.morning=[];
-    hourangles.afternoon=[];
-    hourangles.count = (12 - start);
+    var thishourangles = {};
+    thishourangles.morning = [];
+    thishourangles.afternoon = [];
+    thishourangles.count = (12 - thisstarthour);
 
-	for(var i = 0; i < hourangles.count; i++) {        
+	for(var i = 0; i < thishourangles.count; i++) {        
         var morning = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(-angleincrement)));
         var afternoon = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(angleincrement)));
-        hourangles.morning.push(morning);
-        hourangles.afternoon.push(afternoon);
+        thishourangles.morning.push(morning);
+        thishourangles.afternoon.push(afternoon);
         angleincrement += 15;
     }
 
-    if (debug && rendercount < 1) 
-        console.log(hourangles.morning);
+    if (debug && rendercount < 1) {
+        console.log(rendercount);
+        console.log(thisstarthour);
+        console.log(thislatitude);
+        console.log(latitude);              // somewhere in here is the bug
+                                            // calls this twice
+        console.log(thishourangles.morning);
+        console.log(thishourangles.afternoon);
+    }
 
-	return hourangles;
+	return thishourangles;
 }
 
 function calculateShadowAngle(thislatitude, thisseconds) {
@@ -395,7 +397,7 @@ function calculateShadowAngle(thislatitude, thisseconds) {
     // atan takes a value (ratio) and returns an angle in radians
     // sin, tan take an angle in radians return a value (ratio)
 
-    var thisshadowangle={};
+    var thisshadowangle = {};
     var omega = map(thisseconds,0,86400,0,360);
     if (omega < 180)
         thisshadowangle.am = true;
@@ -570,6 +572,16 @@ function updateHours(thislatitude) {
     return hours;
 }
 
+function updateStatus (thisrendercount) {
+
+    if (thisrendercount < 30)
+        document.getElementById("status").innerHTML = "Determining position . . . <span id='cursor'>|<span>";
+    if (thisrendercount > 60 && thisrendercount < 90)
+        document.getElementById("status").innerHTML = "** ready ** <span id='cursor'>|<span>";
+    if (thisrendercount > 90)
+        document.getElementById("status").innerHTML = "<span id='cursor'>|<span>";
+}
+
 function renderObj(obj,q) {
 
 	var rotatedObj = rotateObject(obj,q);
@@ -699,6 +711,7 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
+    updateStatus (rendercount);
     rendercount ++;
 }
 
@@ -720,10 +733,12 @@ function processGyro(alpha,beta,gamma) {
 	document.getElementById("alpha").innerHTML = alpha.toFixed(5);
 	document.getElementById("beta").innerHTML = beta.toFixed(5);
 	document.getElementById("gamma").innerHTML = gamma.toFixed(5);
-	document.getElementById("x").innerHTML = gyro.x.toFixed(5);
+	/*
+    document.getElementById("x").innerHTML = gyro.x.toFixed(5);
 	document.getElementById("y").innerHTML = gyro.y.toFixed(5);
 	document.getElementById("z").innerHTML = gyro.z.toFixed(5);
 	document.getElementById("w").innerHTML = gyro.w.toFixed(5);
+    */
 }
 
 function setPosition(position) {
