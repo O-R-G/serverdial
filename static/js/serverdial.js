@@ -20,10 +20,12 @@ var debug = true;
 var latitude;     
 var headingnorth;           
     
-var status;
-var display;
 var canvas;
 var context;
+// var status;
+var status = document.getElementById("status");
+
+var display;
 
 var gyro;
 var userQuat;
@@ -86,7 +88,7 @@ function init () {
 
     // canvas setup
     
-    status = document.getElementById("status");
+    // status = document.getElementById("status").innerHTML;
     display = document.getElementById("latitude");
 
     canvas = document.getElementById('gyroCanvas');
@@ -97,16 +99,10 @@ function init () {
     // context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
     context.fillStyle = "#EEE";
 
-    // status.innerHTML = "init() called ... <span id='cursor'>|<span>";
-    console.log(document.getElementById("status").innerHTML);
-    console.log(status.innerHTML);
+    document.getElementById("status").innerHTML = "Finding geolocation ... <span id='cursor'>|<span>";
 }
 
 function setup () {
-
-// console.log(status.innerHTML);
-
-console.log(document.getElementById("status"));
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
     if (!headingnorth) headingnorth = 13.000;
@@ -133,7 +129,7 @@ console.log(document.getElementById("status"));
     // ?? hours.color(s) ??
     shadow.color="black";
 
-    status.innerHTML = "setup() ... <span id='cursor'>|<span>";
+    document.getElementById("status").innerHTML = "setup() ... <span id='cursor'>|<span>";
 
     if (window.self)
         start();
@@ -142,7 +138,7 @@ console.log(document.getElementById("status"));
 function start () {
 
     renderTimer = window.setInterval(renderLoop, 1000/20);
-    status.innerHTML = "start() ... <span id='cursor'>|<span>";
+    document.getElementById("status").innerHTML = "Searching . . . <span id='cursor'>|<span>";
 }
 
 
@@ -460,8 +456,8 @@ function mouseUpFunc(e) {
 }
 	
 function userXYmove(x,y) {
-	document.getElementById("userX").innerHTML=x;
-	document.getElementById("userY").innerHTML=y;
+	// document.getElementById("userX").innerHTML=x; 
+	// document.getElementById("userY").innerHTML=y;
 	
 	if(prevTouchX != -1 ) //need valid prevTouch info to calculate swipe
 	{
@@ -483,13 +479,13 @@ function showInformation () {
 	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
 		document.getElementById('gyroInfo').style.visibility='visible';
 		document.getElementById('quatInfo').style.visibility='visible';
-		document.getElementById('mouseInfo').style.visibility='visible';
+		document.getElementById('geoInfo').style.visibility='visible';
 		showinfo = true;
 		return true;
 	} else {
 		document.getElementById('gyroInfo').style.visibility='hidden';
 		document.getElementById('quatInfo').style.visibility='hidden';
-		document.getElementById('mouseInfo').style.visibility='hidden';
+		document.getElementById('geoInfo').style.visibility='hidden';
 		showinfo = false;
 		return false;
 	}

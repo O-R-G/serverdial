@@ -30,7 +30,7 @@
 		visibility: hidden;
 		color:#333;
 	}
-	#mouseInfo {
+	#geoInfo {
 		position:fixed;
 		bottom:10px;
 		left:10px;
@@ -44,21 +44,23 @@
 </div>
 
 <div id="gyroInfo">		
-	&Alpha;: <span id="alpha"></span><br />
-	&Beta;: <span id="beta"></span><br />
-	&Gamma;: <span id="gamma"></span><br />
 </div>
     
 <div id="quatInfo">
+	&Alpha;: <span id="alpha"></span><br />
+	&Beta;: <span id="beta"></span><br />
+	&Gamma;: <span id="gamma"></span><br />
 	x: <span id="x">x</span><br />
 	y: <span id="y">y</span><br />
 	z: <span id="z">z</span><br />
 	w: <span id="w">w</span><br /> 
 </div>
     
-<div id="mouseInfo">
-	X: <span id="userX"></span><br />
+<div id="geoInfo">
+	<!--
+    X: <span id="userX"></span><br />
     Y: <span id="userY"></span><br />
+    -->
 	<span id="latitude"></span><br />
 </div>
 
