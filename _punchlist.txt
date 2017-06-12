@@ -44,8 +44,8 @@ x hour lines
 + load suncalc.js check?
 + css load animation
   https://codepen.io/rusjames/pen/uAFhE
++ simulategyro / animate logic for mobile
 
-- simulategyro / animate logic for mobile
 - colors (hours.colors, background, etc)
 
 / gnomon should always start pointing north
@@ -55,4 +55,5 @@ x hour lines
   but should apply to gnomon and to hours
   essentially should be a global transform but has to be in proper order
 
+- redirect all http:// to https:// (.htaccess?)
 - google analytics
