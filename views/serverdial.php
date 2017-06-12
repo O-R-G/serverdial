@@ -8,9 +8,16 @@
 		position: fixed;
 		top:0px;
 	}
-	#gyroInfo {		  
+	#status {		  
 		position:fixed;
 		top:10px;
+		left:10px;
+		/* visibility: hidden; */
+		color:#333;
+	}
+	#gyroInfo {		  
+		position:fixed;
+		top:100px;
 		left:10px;
 		visibility: hidden;
 		color:#333;
@@ -31,6 +38,10 @@
 		color:#333;
 	}
 </style>
+
+<div id="status">
+    ...<span id="cursor">|</span>
+</div>
 
 <div id="gyroInfo">		
 	&Alpha;: <span id="alpha"></span><br />
@@ -55,3 +66,10 @@
 
 <script src='static/js/suncalc/suncalc.js'></script>
 <script src='static/js/serverdial.js'></script>
+<script>
+    // (...) is a self-invoking function
+    ( function () {
+        init ();
+    } )();
+</script>
+

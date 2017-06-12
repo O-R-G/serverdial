@@ -13,14 +13,15 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = false;
+var simulategyro = true;
 var rendercount = 0;
 var debug = true;
 
-var display = document.getElementById("latitude");
 var latitude;     
 var headingnorth;           
     
+var status;
+var display;
 var canvas;
 var context;
 
@@ -29,20 +30,14 @@ var userQuat;
 var prevTouchX;
 var prevTouchY;
 
-var sun;
-
 var xaxis;
 var yaxis;
 var zaxis;
-
 var gnomon;
 var shadow;
 var hours;
 
-    
-// ** fix **
-// ***** call on document load in html ******
-init(); 
+var sun;
 
 
 // 0. init, setup, start
@@ -90,17 +85,28 @@ function init () {
     // document.addEventListener("touchStart",showInformation);
 
     // canvas setup
+    
+    status = document.getElementById("status");
+    display = document.getElementById("latitude");
 
     canvas = document.getElementById('gyroCanvas');
     context = canvas.getContext('2d');
     context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
     context.canvas.height = window.innerHeight;
     context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
-    context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
+    // context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
     context.fillStyle = "#EEE";
+
+    // status.innerHTML = "init() called ... <span id='cursor'>|<span>";
+    console.log(document.getElementById("status").innerHTML);
+    console.log(status.innerHTML);
 }
 
 function setup () {
+
+// console.log(status.innerHTML);
+
+console.log(document.getElementById("status"));
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
     if (!headingnorth) headingnorth = 13.000;
@@ -114,9 +120,10 @@ function setup () {
     yaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
     zaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 
+    // ** fix ** do i even need values here or should these be initted at null? 
     gnomon = updateGnomon(latitude);
     // gnomon = updateHeadingNorth(gnomon, headingnorth, canvas.width/4.0);
-    shadow = updateShadow(new Date());
+    shadow = updateShadow(latitude, 0);   
     hours = updateHours(latitude);
 
     xaxis.color="#FF0000";
@@ -126,6 +133,8 @@ function setup () {
     // ?? hours.color(s) ??
     shadow.color="black";
 
+    status.innerHTML = "setup() ... <span id='cursor'>|<span>";
+
     if (window.self)
         start();
 }
@@ -133,6 +142,7 @@ function setup () {
 function start () {
 
     renderTimer = window.setInterval(renderLoop, 1000/20);
+    status.innerHTML = "start() ... <span id='cursor'>|<span>";
 }
 
 
@@ -389,7 +399,7 @@ function calculateHourAngles(thislatitude, start) {
 	return hourangles;
 }
 
-function calculateShadowAngle(thislatitude, now) {
+function calculateShadowAngle(thislatitude, thisseconds) {
 
     // find the angle of offset for the shadow based on current time
     // where now is currenttime in seconds and is mapped into range 0-360°
@@ -400,7 +410,7 @@ function calculateShadowAngle(thislatitude, now) {
     // sin, tan take an angle in radians return a value (ratio)
 
     var thisshadowangle={};
-    var omega = map(now,0,86400,0,360);
+    var omega = map(thisseconds,0,86400,0,360);
     if (omega < 180)
         thisshadowangle.am = true;
     thisshadowangle.radians = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(omega)));
@@ -503,14 +513,14 @@ function updateGnomon(thislatitude) {
     return thisgnomon;
 }
 
-function updateShadow(now, thislatitude) {
+function updateShadow(thislatitude, thisseconds) {
 
     // ** fix ** currently using date object and not getting seconds! 
     // how is it working???
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
 
-    shadowangle = calculateShadowAngle(thislatitude, now);
+    shadowangle = calculateShadowAngle(thislatitude, thisseconds);
     // var shadowquat = quatFromAxisAngle(0,0,1,shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
     var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
                                                                         // as per sundial.pdf paper
@@ -665,13 +675,13 @@ function renderLoop() {
 
     // animate shadow
     if (rendercount*1500 < seconds && animate) 
-        shadow = updateShadow(rendercount*1500, latitude);
+        shadow = updateShadow(latitude, rendercount*1500);
     else 
-        shadow = updateShadow(seconds, latitude);
+        shadow = updateShadow(latitude, seconds);
 
     // animate gryo
-    if ((rendercount < latitude)) {
-        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window) && (simulategyro)) {
+    if ((rendercount < latitude) || simulategyro) {
+        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window)) {
     	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
 	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
             this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis

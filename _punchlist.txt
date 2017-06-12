@@ -39,24 +39,28 @@ x hour lines
 + callback get latitude logic, timing, checkSun 
 + var latitude scope, thislatitude 
 + debug var debug
-
-/ shadow logic
-    currently uses a date object, not a value! ** fix **
-
-- init() on document load in html
-- load suncalc.js check?
-- css load animation
++ shadow logic
++ init() on document load in html
++ load suncalc.js check?
+/ css load animation
+  top left = status
+  bottom left = latitude, heading
+  bottom right = quaternion, x y z offset
   https://codepen.io/rusjames/pen/uAFhE
   http://jsfiddle.net/leaverou/y8kNx/
+  move other information to bottom left (lat) and right (quat)
   Loading ...
   Getting latitude
   Latitude found, etc.
 
-/ gnomon always starts pointing north
+- simulategyro / animate logic for mobile
+/ gnomon should always start pointing north
   and rotated to correct orientation
   need to work out order of transformations and correct naming
   should not be updateHeadingNorth
   but should apply to gnomon and to hours
   essentially should be a global transform but has to be in proper order
+
+- colors (hours.colors, background, etc)
 
 - google analytics
