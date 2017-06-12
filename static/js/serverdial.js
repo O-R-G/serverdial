@@ -67,7 +67,7 @@ function init () {
 
     // event listeners
 
-    userQuat=quatFromAxisAngle(0,0,0,0);//a quaternion to represent the users finger swipe movement - default is no rotation
+    userQuat = quatFromAxisAngle(0,0,0,0);//a quaternion to represent the users finger swipe movement - default is no rotation
     prevTouchX = -1; // -1 is flag for no previous touch info
     prevTouchY = -1;
 
@@ -98,7 +98,7 @@ function init () {
 function setup () {
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
-    if (!headingnorth) headingnorth = .5000;
+    if (!headingnorth) headingnorth = 254.5000;
 
     // sun?
     sun = checkSun(new Date(), latitude);   // should be in update()?
@@ -109,17 +109,15 @@ function setup () {
     yaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
     zaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
 
-    // ** fix ** do i even need values here or should these be initted at null? 
     gnomon = updateGnomon(latitude);
-    shadow = updateShadow(latitude, 0);   
     hours = updateHours(latitude);
+    shadow = updateShadow(latitude, 0);   
                 
-    xaxis.color="#FF0000";
-    yaxis.color="#00CC00";
-    zaxis.color="#0000FF";
-    gnomon.color="purple";
-    // ?? hours.color(s) ??
-    shadow.color="black";
+    xaxis.color = "#FF0000";
+    yaxis.color = "#00CC00";
+    zaxis.color ="#0000FF";
+    gnomon.color = "#009999";
+    hours.color = "#00FF00";
 
     document.getElementById("status").innerHTML = "setup() ... <span id='cursor'>|<span>";
 
@@ -490,49 +488,35 @@ function updateGnomon(thislatitude) {
 
     // construct gnomon with angle = latitude
     // -90° < latitude < 90° (absolute value within range 0-90°)
+    // combine two quaternions by multiplication, last transformation first
 
-    // should be a set size for the gnomon
-    // and this function should just update rotation when needed
-
-    var angle = Math.abs(thislatitude);
     var thisgnomon = makeRect(4.0, canvas.width/3.0, 4.0);
-
-    /*	    
-    // combine two quaternions by multiplication
-    // last transformation first
+    var angle = Math.abs(thislatitude);
     var thisgnomonquatx = quatFromAxisAngle(1,0,0,degToRad(angle));    
-    var thisgnomonquatz = quatFromAxisAngle(0,0,1,-degToRad(angle));    
+    var thisgnomonquatz = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
     thisgnomonquat = quaternionMultiply([thisgnomonquatz, thisgnomonquatx]);
-    */
-
-    var thisgnomonquat = quatFromAxisAngle(1,0,0,degToRad(angle)); 
     thisgnomon = transformObject(thisgnomon,0, canvas.width/6.0,0);    // move to origin
     thisgnomon = rotateObject(thisgnomon,thisgnomonquat);
-    // thisgnomon = transformObject(thisgnomon,0, -canvas.width/4.0,0);
+    thisgnomon.color = "#990099";
 
     return thisgnomon;
 }
 
 function updateShadow(thislatitude, thisseconds) {
 
-    // ** fix ** currently using date object and not getting seconds! 
-    // how is it working???
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
-
-    // elsewhere there should be a set size for the shadow also
-    // and probably makeRect once not many times (same as gnomon)
+    // combine two quaternions by multiplication, last transformation first
+    // one for current time, one for heading north
 
     var thisshadow = makeRect(1.0, canvas.width/3.0, 0.0);
-
-    var shadowangle = calculateShadowAngle(thislatitude, thisseconds);
-    // var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians/2);    // /2 bc angle from origin
-    var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians);
+    var shadowangle = calculateShadowAngle(thislatitude, thisseconds);      
+    var thisshadowquattime = quatFromAxisAngle(0,0,1,-shadowangle.radians);
+    var thisshadowquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
+    var thisshadowquat = quaternionMultiply([thisshadowquatnorth, thisshadowquattime]);
     thisshadow = transformObject(thisshadow,0,canvas.width/6.0,0);
-    thisshadow = rotateObject(thisshadow,shadowquat);
-    // thisshadow = transformObject(thisshadow,0,-canvas.width/4.0,0);
-
-    // if (debug) console.log(seconds + " : " + angle);
+    thisshadow = rotateObject(thisshadow,thisshadowquat);
+    thisshadow.color = "#666666";
 
     return thisshadow;
 }
@@ -549,53 +533,45 @@ function updateHours(thislatitude) {
     var hours = [];
 
     // noon
-    var thishourquat = quatFromAxisAngle(0,0,1,0);
+
     var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
-    thishour = transformObject(thishour,0, canvas.width/3,0);
-    thishour = rotateObject(thishour,thishourquat);    
-    thishour.color="green";
+    var thisquatnoon = quatFromAxisAngle(0,0,1,0);
+    var thisquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
+    var thisquat = quaternionMultiply([thisquatnorth, thisquatnoon]);
+    thishour = transformObject(thishour,0,canvas.width/3,0);
+    thishour = rotateObject(thishour,thisquat);    
+    thishour.color = "green";
     hours.push(thishour);
 
     for (i = 0; i < hourangles.count; i++) {
 
         // morning
-        var thishourquat = quatFromAxisAngle(0,0,1,hourangles.morning[i]);
         var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+        var thisquathour = quatFromAxisAngle(0,0,1,hourangles.morning[i]);
+        var thisquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
+        var thisquat = quaternionMultiply([thisquatnorth, thisquathour]);
         thishour = transformObject(thishour,0,canvas.width/3,0);
-        thishour = rotateObject(thishour,thishourquat);
-        thishour.color="red";
+        thishour = rotateObject(thishour,thisquat);
+        thishour.color = "red";
         hours.push(thishour);
 
         // afternoon
-        var thishourquat = quatFromAxisAngle(0,0,1,hourangles.afternoon[i]);
         var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+        var thisquathour = quatFromAxisAngle(0,0,1,hourangles.afternoon[i]);
+        var thisquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
+        var thisquat = quaternionMultiply([thisquatnorth, thisquathour]);
         thishour = transformObject(thishour,0,canvas.width/3,0);
-        thishour = rotateObject(thishour,thishourquat);
-        thishour.color="blue";
+        thishour = rotateObject(thishour,thisquat);
+        thishour.color = "blue";
         hours.push(thishour);
     }
 
     return hours;
 }
 
-function updateNorth(thisobject, thisheading, thisoffsety) {
-
-    // takes a 3d object and performs orientation in relation to north
-    // uses geolocation if available and otherwise defaults to 0° offset
-
-    // north = makeRect(1.0, canvas.width/1.5, canvas.width/1.5);
-
-    var thisquat = quatFromAxisAngle(0,0,1,degToRad(thisheading));    
-    // thisobject = transformObject(thisobject,0,-thisoffsety,0);
-    thisobject = rotateObject(thisobject,thisquat);
-    // thisobject = transformObject(thisobject,0,thisoffsety,0,0);
-    console.log(thisheading);
-    return thisobject;
-}
-
 function renderObj(obj,q) {
 
-	var rotatedObj=rotateObject(obj,q);
+	var rotatedObj = rotateObject(obj,q);
 	context.lineWidth = 1.0;    // [1.0]
 	context.strokeStyle = obj.color;
 	
@@ -632,11 +608,6 @@ function renderObj(obj,q) {
             else if (showinfo)      
                 context.lineTo(scaleByZ(vertexTo[0],vertexTo[2]), ( -scaleByZ(vertexTo[1],vertexTo[2])));
             */
-
-            // not working, not sure why
-            // perhaps to do with the points in the wrong sequence?
-            // context.fillStyle = "blue";
-            // context.fill();
 
             context.stroke();		    
 		}
@@ -679,7 +650,7 @@ function renderLoop() {
     var now = new Date();
     var seconds = ((now.getHours() * 60 + now.getMinutes()) * 60) + now.getSeconds();
 
-    // requestAnimationFrame( renderLoop ); //better than set interval as it pauses when browser isn't active
+    // requestAnimationFrame( renderLoop ); // better than set interval as it pauses when browser isn't active
     context.clearRect( -canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
 
     // animate hours
