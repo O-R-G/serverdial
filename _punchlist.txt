@@ -45,8 +45,11 @@ x hour lines
 + css load animation
   https://codepen.io/rusjames/pen/uAFhE
 + simulategyro / animate logic for mobile
+/ redirect all http:// to https:// (.htaccess?)
+  https://stackoverflow.com/questions/16200501/http-to-https-apache-redirection
 
 - colors (hours.colors, background, etc)
+  hollows?
 
 / gnomon should always start pointing north
   and rotated to correct orientation
@@ -55,5 +58,4 @@ x hour lines
   but should apply to gnomon and to hours
   essentially should be a global transform but has to be in proper order
 
-- redirect all http:// to https:// (.htaccess?)
 - google analytics
