@@ -98,7 +98,7 @@ function init () {
 function setup () {
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
-    if (!headingnorth) headingnorth = 254.5000;
+    if (!headingnorth) headingnorth = 30.0000;
 
     // sun?
     sun = checkSun(new Date(), latitude);   // should be in update()?
@@ -540,6 +540,7 @@ function updateHours(thislatitude) {
     var thisquat = quaternionMultiply([thisquatnorth, thisquatnoon]);
     thishour = transformObject(thishour,0,canvas.width/3,0);
     thishour = rotateObject(thishour,thisquat);    
+    // thishour.color = "#990099";
     thishour.color = "green";
     hours.push(thishour);
 
@@ -728,7 +729,7 @@ function processGyro(alpha,beta,gamma) {
 function setPosition(position) {
     latitude = position.coords.latitude.toFixed(4);
     if (position.coords.heading)
-        headingnorth = position.coords.heading.toFixed(4);      
+        headingnorth = position.coords.heading.toFixed(4);
     display.innerHTML = latitude + "&deg;";
     setup();
 }

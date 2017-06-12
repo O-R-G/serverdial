@@ -48,13 +48,15 @@ x hour lines
 + redirect all http:// to https:// (.htaccess?)
   https://stackoverflow.com/questions/16200501/http-to-https-apache-redirection
 + update and headingnorth logic
-/ gnomon should always start pointing north
+x gnomon should always start pointing north
+  impossible as coords.heading does not yet work in ios safari
++ colors (hours.colors, background, etc) hollows?
 
+- fix hours distribution for more than 11
 - implement sun or no sun
 - loading sequence
-- colors (hours.colors, background, etc) hollows?
-- requestAnimationFrame() ?
 
+- requestAnimationFrame() ?
 - google analytics
  
  
