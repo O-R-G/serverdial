@@ -13,7 +13,7 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = true;
+var simulategyro = false;
 var rendercount = 0;
 var debug = true;
 
@@ -22,9 +22,6 @@ var headingnorth;
     
 var canvas;
 var context;
-// var status;
-var status = document.getElementById("status");
-
 var display;
 
 var gyro;
@@ -46,9 +43,9 @@ var sun;
 
 function init () {
 
-    // get latitude, north heading
+    // get latitude, heading north
     // callback to setPosition which starts setup()
-    // otherwise, go straight to setup()
+    // otherwise, use default latitude and do setup()
  
     if (navigator.geolocation) {
         // callback setPosition calls setup() when finished
@@ -68,12 +65,11 @@ function init () {
         }, true);
     }
 
-    // mouse, touch
+    // event listeners
+
     userQuat=quatFromAxisAngle(0,0,0,0);//a quaternion to represent the users finger swipe movement - default is no rotation
     prevTouchX = -1; // -1 is flag for no previous touch info
     prevTouchY = -1;
-
-    // event listeners
 
     document.addEventListener("touchstart", touchStartFunc, true);
     document.addEventListener("touchmove", touchmoveFunc, true);
@@ -81,14 +77,11 @@ function init () {
     document.addEventListener("mousedown", mouseDownFunc, true);
     document.addEventListener("mousemove", mouseMoveFunc, true);
     document.addEventListener("mouseup", mouseUpFunc, true);
-
-    // if init loads on document load then these should work
     // document.addEventListener("click",showInformation);
     // document.addEventListener("touchStart",showInformation);
 
     // canvas setup
     
-    // status = document.getElementById("status").innerHTML;
     display = document.getElementById("latitude");
 
     canvas = document.getElementById('gyroCanvas');
@@ -105,7 +98,7 @@ function init () {
 function setup () {
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
-    if (!headingnorth) headingnorth = 13.000;
+    if (!headingnorth) headingnorth = .5000;
 
     // sun?
     sun = checkSun(new Date(), latitude);   // should be in update()?
@@ -118,10 +111,9 @@ function setup () {
 
     // ** fix ** do i even need values here or should these be initted at null? 
     gnomon = updateGnomon(latitude);
-    // gnomon = updateHeadingNorth(gnomon, headingnorth, canvas.width/4.0);
     shadow = updateShadow(latitude, 0);   
     hours = updateHours(latitude);
-
+                
     xaxis.color="#FF0000";
     yaxis.color="#00CC00";
     zaxis.color="#0000FF";
@@ -499,12 +491,24 @@ function updateGnomon(thislatitude) {
     // construct gnomon with angle = latitude
     // -90° < latitude < 90° (absolute value within range 0-90°)
 
+    // should be a set size for the gnomon
+    // and this function should just update rotation when needed
+
     var angle = Math.abs(thislatitude);
-    var thisgnomonquat = quatFromAxisAngle(0,1,0,degToRad(angle));    
-    var thisgnomon = makeRect(canvas.width/2.0, 4.0, 4.0);
-    thisgnomon = transformObject(thisgnomon,-canvas.width/4.0,0,0);
+    var thisgnomon = makeRect(4.0, canvas.width/3.0, 4.0);
+
+    /*	    
+    // combine two quaternions by multiplication
+    // last transformation first
+    var thisgnomonquatx = quatFromAxisAngle(1,0,0,degToRad(angle));    
+    var thisgnomonquatz = quatFromAxisAngle(0,0,1,-degToRad(angle));    
+    thisgnomonquat = quaternionMultiply([thisgnomonquatz, thisgnomonquatx]);
+    */
+
+    var thisgnomonquat = quatFromAxisAngle(1,0,0,degToRad(angle)); 
+    thisgnomon = transformObject(thisgnomon,0, canvas.width/6.0,0);    // move to origin
     thisgnomon = rotateObject(thisgnomon,thisgnomonquat);
-    thisgnomon = transformObject(thisgnomon,canvas.width/4.0,0,0);
+    // thisgnomon = transformObject(thisgnomon,0, -canvas.width/4.0,0);
 
     return thisgnomon;
 }
@@ -516,15 +520,17 @@ function updateShadow(thislatitude, thisseconds) {
     // update shadow based on current time
     // rotate around z-axis using quaternion derived from axis angle 
 
-    shadowangle = calculateShadowAngle(thislatitude, thisseconds);
-    // var shadowquat = quatFromAxisAngle(0,0,1,shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
-    var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians/2);    // /2 because angle is origin is in middle of circle
-                                                                        // as per sundial.pdf paper
-                                                                        // negative value? why? unsure ... ** fix **
-    var thisshadow = makeRect(canvas.width/2.0, 1.0, 0.0);
-    thisshadow = transformObject(thisshadow,-canvas.width/4.0,0,0);
+    // elsewhere there should be a set size for the shadow also
+    // and probably makeRect once not many times (same as gnomon)
+
+    var thisshadow = makeRect(1.0, canvas.width/3.0, 0.0);
+
+    var shadowangle = calculateShadowAngle(thislatitude, thisseconds);
+    // var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians/2);    // /2 bc angle from origin
+    var shadowquat = quatFromAxisAngle(0,0,1,-shadowangle.radians);
+    thisshadow = transformObject(thisshadow,0,canvas.width/6.0,0);
     thisshadow = rotateObject(thisshadow,shadowquat);
-    thisshadow = transformObject(thisshadow,canvas.width/4.0,0,0);
+    // thisshadow = transformObject(thisshadow,0,-canvas.width/4.0,0);
 
     // if (debug) console.log(seconds + " : " + angle);
 
@@ -544,8 +550,8 @@ function updateHours(thislatitude) {
 
     // noon
     var thishourquat = quatFromAxisAngle(0,0,1,0);
-    var thishour = makeRect(canvas.width/20.0, 0.5, 0.5);
-    thishour = transformObject(thishour,-canvas.width/3,0,0);
+    var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+    thishour = transformObject(thishour,0, canvas.width/3,0);
     thishour = rotateObject(thishour,thishourquat);    
     thishour.color="green";
     hours.push(thishour);
@@ -554,16 +560,16 @@ function updateHours(thislatitude) {
 
         // morning
         var thishourquat = quatFromAxisAngle(0,0,1,hourangles.morning[i]);
-        var thishour = makeRect(canvas.width/20.0, 0.5, 0.5);
-        thishour = transformObject(thishour,-canvas.width/3,0,0);
+        var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+        thishour = transformObject(thishour,0,canvas.width/3,0);
         thishour = rotateObject(thishour,thishourquat);
         thishour.color="red";
         hours.push(thishour);
 
         // afternoon
         var thishourquat = quatFromAxisAngle(0,0,1,hourangles.afternoon[i]);
-        var thishour = makeRect(canvas.width/20.0, 0.5, 0.5);
-        thishour = transformObject(thishour,-canvas.width/3,0,0);
+        var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+        thishour = transformObject(thishour,0,canvas.width/3,0);
         thishour = rotateObject(thishour,thishourquat);
         thishour.color="blue";
         hours.push(thishour);
@@ -572,10 +578,25 @@ function updateHours(thislatitude) {
     return hours;
 }
 
+function updateNorth(thisobject, thisheading, thisoffsety) {
+
+    // takes a 3d object and performs orientation in relation to north
+    // uses geolocation if available and otherwise defaults to 0° offset
+
+    // north = makeRect(1.0, canvas.width/1.5, canvas.width/1.5);
+
+    var thisquat = quatFromAxisAngle(0,0,1,degToRad(thisheading));    
+    // thisobject = transformObject(thisobject,0,-thisoffsety,0);
+    thisobject = rotateObject(thisobject,thisquat);
+    // thisobject = transformObject(thisobject,0,thisoffsety,0,0);
+    console.log(thisheading);
+    return thisobject;
+}
+
 function renderObj(obj,q) {
 
 	var rotatedObj=rotateObject(obj,q);
-	context.lineWidth = 0.5;    // [1.0]
+	context.lineWidth = 1.0;    // [1.0]
 	context.strokeStyle = obj.color;
 	
 	function scaleByZ(val,z) {
@@ -676,12 +697,14 @@ function renderLoop() {
         shadow = updateShadow(latitude, seconds);
 
     // animate gryo
-    if ((rendercount < latitude) || simulategyro) {
-        if(!( window.DeviceOrientationEvent && 'ontouchstart' in window)) {
-    	    this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
-	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
-            this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
-    	    processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+    if (simulategyro) {
+        if ((rendercount < latitude)) {
+            if(!( window.DeviceOrientationEvent && 'ontouchstart' in window)) {
+    	        this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
+       	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
+                this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
+    	        processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+            }
         }
     }
 
@@ -754,19 +777,6 @@ function showError(error) {
             display.innerHTML = "Unknown error occurred."
             break;
     }
-}
-
-function updateHeadingNorth(thisobject, thisheading, thisoffsetx) {
-
-    // takes a 3d object and performs orientation in relation to north
-    // uses geolocation if available and otherwise defaults to 0° offset
-
-    var thisquat = quatFromAxisAngle(0,0,1,degToRad(thisheading));    
-    thisobject = transformObject(thisobject,-thisoffsetx,0,0);
-    thisobject = rotateObject(thisobject,thisquat);
-    thisobject = transformObject(thisobject,thisoffsetx,0,0);
-    console.log(thisheading);
-    return thisobject;
 }
 
 function checkSun (now, thislatitude) {
