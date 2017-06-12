@@ -383,7 +383,8 @@ function calculateHourAngles(thislatitude, start) {
         angleincrement += 15;
     }
 
-    // if (debug) console.log(hourangles.morning);
+    if (debug && rendercount < 1) 
+        console.log(hourangles.morning);
 
 	return hourangles;
 }
@@ -404,7 +405,8 @@ function calculateShadowAngle(thislatitude, now) {
         thisshadowangle.am = true;
     thisshadowangle.radians = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(omega)));
 
-    // if (debug) console.log(hourangles.morning);
+    if (debug && rendercount < 1) 
+       console.log(thisshadowangle);
 
 	return thisshadowangle;
 }

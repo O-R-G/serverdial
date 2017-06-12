@@ -38,8 +38,7 @@ x hour lines
 + init(), setup(), start()
 + callback get latitude logic, timing, checkSun 
 + var latitude scope, thislatitude 
-
-- debug debug flag
++ debug var debug
 
 / shadow logic
     currently uses a date object, not a value! ** fix **
