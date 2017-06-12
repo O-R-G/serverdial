@@ -35,15 +35,24 @@ x hour lines
 + sunrise / sunset
   determines when shadow shows or not
   use https://github.com/mourner/suncalc
++ init(), setup(), start()
++ callback get latitude logic, timing, checkSun 
+
+- var latitude scope, thislatitude etc -- prob just use a global?
 
 / shadow logic
     currently uses a date object, not a value! ** fix **
 
-- callback get latitude logic, timing, checkSun 
-  certain things need to happen before others
-  include init() function to trigger all else?
-  or init() and start()
-- var latitude scope and callback
+- init() on document load in html
+- load suncalc.js check?
+
+- css load animation
+  https://codepen.io/rusjames/pen/uAFhE
+  http://jsfiddle.net/leaverou/y8kNx/
+  Loading ...
+  Getting latitude
+  Latitude found, etc.
+- debug debug flag
 
 / gnomon always starts pointing north
   and rotated to correct orientation
@@ -51,7 +60,5 @@ x hour lines
   should not be updateHeadingNorth
   but should apply to gnomon and to hours
   essentially should be a global transform but has to be in proper order
-
-- debug debug flag
 
 - google analytics turn on
