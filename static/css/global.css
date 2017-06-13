@@ -6,10 +6,9 @@
 
 html, body {
 	height: 100%;
-
 }
 
-body, #page {
+body {
 	margin: 0;
 	width: 100%;
 	height: 100%;
@@ -18,8 +17,11 @@ body, #page {
 	font-size: 18px;
 	line-height: 22px;
 	 
-    background-image: url("/media/gif/hollows-10.gif"); 
-    /* background-color: #000000; */
+    /* background-color: #000; */
+    background-color: #CCC;
+    /* background-color: #FFF; */
+    background-image: url("/media/gif/hollows-10.gif");
+    /* background-image: url("/media/gif/hollows-10-inverse.gif"); */
     /* background-color: #FFFFFF; */
 
 	/*white-space:nowrap;*/

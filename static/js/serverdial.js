@@ -13,7 +13,7 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = false;
+var simulategyro = true;
 var rendercount = 0;
 var debug = true;
 
@@ -682,14 +682,14 @@ function renderLoop() {
 
     // animate gryo
     if (simulategyro) {
-        if ((rendercount < latitude)) {
+        // if ((rendercount < latitude)) {
             if(!( window.DeviceOrientationEvent && 'ontouchstart' in window)) {
     	        this.fakeAlpha = (this.fakeAlpha || 0)+ .0;//z axis - use 0 to turn off rotation
        	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
                 this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
     	        processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
             }
-        }
+        // }
     }
 
     renderObj(xaxis,quaternionMultiply([inverseQuaternion(gyro),userQuat]));

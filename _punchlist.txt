@@ -56,12 +56,17 @@ x gnomon should always start pointing north
     https://richtr.github.io/Marine-Compass/
 + loading sequence
   use numbers in rendercount to trigger sequential events
+x animate gyro loading
+
+- fix horizontal canvas sizing in landscape mode
 
 / fix hours distribution for more than 11
   problem with trigonometry?
   look at calculate shadow angles also -- probably a clue there
   review sundial.pdf
 
+/ background color
+- catch errors on user block location
 - implement sun or no sun
 - requestAnimationFrame() ?
 - google analytics
