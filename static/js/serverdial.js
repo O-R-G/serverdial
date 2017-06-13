@@ -369,7 +369,18 @@ function calculateHourAngles(thislatitude, thisstarthour) {
 	for(var i = 0; i < thishourangles.count; i++) {        
         var morning = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(-angleincrement)));
         var afternoon = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(angleincrement)));
-        thishourangles.morning.push(morning);
+
+
+        // debug for > 90°
+        // 90° = Math.PI/2
+        // rewrite for radians
+        var morningdebug = radToDeg(morning);
+        if (morningdebug > 0) morningdebug -= 180;
+        thishourangles.morning.push(degToRad(morningdebug));
+
+        // if (morning > Math.PI/2) morning -= Math.PI;
+        // thishourangles.morning.push(morning);
+
         thishourangles.afternoon.push(afternoon);
         angleincrement += 15;
     }
@@ -377,11 +388,7 @@ function calculateHourAngles(thislatitude, thisstarthour) {
     if (debug && rendercount < 1) {
         console.log(rendercount);
         console.log(thisstarthour);
-        console.log(thislatitude);
-        console.log(latitude);              // somewhere in here is the bug
-                                            // calls this twice
         console.log(thishourangles.morning);
-        console.log(thishourangles.afternoon);
     }
 
 	return thishourangles;
@@ -530,8 +537,8 @@ function updateHours(thislatitude) {
     // rotate around z axis based on hourangles starting from 12pm 
     // and working out by morning and afternoon        
 
-    var hourstart = 7;
-    var hourangles = calculateHourAngles(thislatitude, hourstart); 
+    var starthour = 4;
+    var hourangles = calculateHourAngles(thislatitude, starthour); 
     var hours = [];
 
     // noon

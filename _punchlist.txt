@@ -65,6 +65,8 @@ x animate gyro loading
   look at calculate shadow angles also -- probably a clue there
   review sundial.pdf
 
+ ** logic sorted, now implement for hours and shadow in radians **
+
 / background color
 - catch errors on user block location
 - implement sun or no sun
