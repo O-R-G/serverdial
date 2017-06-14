@@ -57,15 +57,15 @@ x gnomon should always start pointing north
 + loading sequence
   use numbers in rendercount to trigger sequential events
 x animate gyro loading
++ calculateHourAngles() hours distribution for more than 11 hours
+/ calculateShadowAngle() logic
 
-- fix horizontal canvas sizing in landscape mode
++ horizontal canvas sizing in landscape mode
+  compute on the fly in .js
 
-/ fix hours distribution for more than 11
-  problem with trigonometry?
-  look at calculate shadow angles also -- probably a clue there
-  review sundial.pdf
+- animateMesasage.js to replace css
 
- ** logic sorted, now implement for hours and shadow in radians **
+
 
 / background color
 - catch errors on user block location

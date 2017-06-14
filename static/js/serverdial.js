@@ -13,7 +13,7 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = true;
+var simulategyro = false;
 var rendercount = 0;
 var debug = true;
 
@@ -23,6 +23,7 @@ var headingnorth;
 var canvas;
 var context;
 var display;
+var maxheightorwidth;
 
 var gyro;
 var userQuat;
@@ -86,11 +87,16 @@ function init () {
 
     canvas = document.getElementById('gyroCanvas');
     context = canvas.getContext('2d');
-    context.canvas.width  = window.innerWidth; //resize canvas to whatever window dimensions are
+    context.canvas.width  = window.innerWidth; // resize canvas to whatever window dimensions are
     context.canvas.height = window.innerHeight;
-    context.translate(canvas.width / 2, canvas.height / 2); //put 0,0,0 origin at center of screen instead of upper left corner
+    context.translate(canvas.width / 2, canvas.height / 2); // move origin to center of screen
     // context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
     context.fillStyle = "#EEE";
+
+    if ( context.canvas.width > context.canvas.height ) 
+        maxheightorwidth = context.canvas.height;
+    else 
+        maxheightorwidth = context.canvas.width;
 }
 
 function setup () {
@@ -102,10 +108,10 @@ function setup () {
     sun = checkSun(new Date(), latitude);   // should be in update()?
 
     // populate stage
-
-    xaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-    yaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
-    zaxis = makeArcWithTriangle(canvas.width/1.5,canvas.width/1.5,0);
+    
+    xaxis = makeArcWithTriangle(maxheightorwidth/1.5,maxheightorwidth/1.5,0);
+    yaxis = makeArcWithTriangle(maxheightorwidth/1.5,maxheightorwidth/1.5,0);
+    zaxis = makeArcWithTriangle(maxheightorwidth/1.5,maxheightorwidth/1.5,0);
 
     gnomon = updateGnomon(latitude);
     hours = updateHours(latitude);
@@ -367,21 +373,24 @@ function calculateHourAngles(thislatitude, thisstarthour) {
     thishourangles.count = (12 - thisstarthour);
 
 	for(var i = 0; i < thishourangles.count; i++) {        
+        
+        // three angles as per sundial.pdf
+        // lamda is angle of gnomon ( = latitude )
+        // omega is angle of rotation around gnomon ( 15° = 1 hour )
+        // theta is angle of offset of omega projected to ground plane
+        // if omega > 90° then triangle turns the other way
+        // so inverse omega's value by subtracting 180°
+        // 90° = Math.PI/2
+ 
         var morning = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(-angleincrement)));
         var afternoon = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(angleincrement)));
 
+        if (morning > 0) morning -= Math.PI;
+        thishourangles.morning.push(morning);
 
-        // debug for > 90°
-        // 90° = Math.PI/2
-        // rewrite for radians
-        var morningdebug = radToDeg(morning);
-        if (morningdebug > 0) morningdebug -= 180;
-        thishourangles.morning.push(degToRad(morningdebug));
-
-        // if (morning > Math.PI/2) morning -= Math.PI;
-        // thishourangles.morning.push(morning);
-
+        if (afternoon < 0) afternoon += Math.PI;
         thishourangles.afternoon.push(afternoon);
+
         angleincrement += 15;
     }
 
@@ -389,6 +398,7 @@ function calculateHourAngles(thislatitude, thisstarthour) {
         console.log(rendercount);
         console.log(thisstarthour);
         console.log(thishourangles.morning);
+        console.log(thishourangles.afternoon);
     }
 
 	return thishourangles;
@@ -408,10 +418,23 @@ function calculateShadowAngle(thislatitude, thisseconds) {
     var omega = map(thisseconds,0,86400,0,360);
     if (omega < 180)
         thisshadowangle.am = true;
+
+    // three angles as per sundial.pdf
+    // lamda is angle of gnomon ( = latitude )
+    // omega is angle of rotation around gnomon ( 15° = 1 hour )
+    // theta is angle of offset of omega projected to ground plane
+    // if omega > 90° then triangle turns the other way
+    // so inverse omega's value by subtracting 180°
+    // 90° = Math.PI/2
+
     thisshadowangle.radians = Math.atan(Math.sin(degToRad(thislatitude)) * Math.tan(degToRad(omega)));
 
-    if (debug && rendercount < 1) 
-       console.log(thisshadowangle);
+    // ** fix ** logic problem here to do with getting accurate time displayed as shadow
+    // if (thisshadowangle.radians < 0) thisshadowangle.radians += Math.PI;
+
+    if (debug && rendercount < 20) 
+       // console.log(thisshadowangle);
+       console.log(radToDeg(thisshadowangle.radians));
 
 	return thisshadowangle;
 }
@@ -499,12 +522,12 @@ function updateGnomon(thislatitude) {
     // -90° < latitude < 90° (absolute value within range 0-90°)
     // combine two quaternions by multiplication, last transformation first
 
-    var thisgnomon = makeRect(4.0, canvas.width/3.0, 4.0);
+    var thisgnomon = makeRect(4.0, maxheightorwidth/3.0, 4.0);
     var angle = Math.abs(thislatitude);
     var thisgnomonquatx = quatFromAxisAngle(1,0,0,degToRad(angle));    
     var thisgnomonquatz = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
     thisgnomonquat = quaternionMultiply([thisgnomonquatz, thisgnomonquatx]);
-    thisgnomon = transformObject(thisgnomon,0, canvas.width/6.0,0);    // move to origin
+    thisgnomon = transformObject(thisgnomon,0, maxheightorwidth/6.0,0);    // move to origin
     thisgnomon = rotateObject(thisgnomon,thisgnomonquat);
     thisgnomon.color = "#990099";
 
@@ -518,12 +541,12 @@ function updateShadow(thislatitude, thisseconds) {
     // combine two quaternions by multiplication, last transformation first
     // one for current time, one for heading north
 
-    var thisshadow = makeRect(1.0, canvas.width/3.0, 0.0);
+    var thisshadow = makeRect(1.0, maxheightorwidth/3.0, 0.0);
     var shadowangle = calculateShadowAngle(thislatitude, thisseconds);      
     var thisshadowquattime = quatFromAxisAngle(0,0,1,-shadowangle.radians);
     var thisshadowquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
     var thisshadowquat = quaternionMultiply([thisshadowquatnorth, thisshadowquattime]);
-    thisshadow = transformObject(thisshadow,0,canvas.width/6.0,0);
+    thisshadow = transformObject(thisshadow,0,maxheightorwidth/6.0,0);
     thisshadow = rotateObject(thisshadow,thisshadowquat);
     thisshadow.color = "#666666";
 
@@ -543,11 +566,11 @@ function updateHours(thislatitude) {
 
     // noon
 
-    var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+    var thishour = makeRect(0.5, maxheightorwidth/20.0, 0.5);
     var thisquatnoon = quatFromAxisAngle(0,0,1,0);
     var thisquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
     var thisquat = quaternionMultiply([thisquatnorth, thisquatnoon]);
-    thishour = transformObject(thishour,0,canvas.width/3,0);
+    thishour = transformObject(thishour,0,maxheightorwidth/3,0);
     thishour = rotateObject(thishour,thisquat);    
     // thishour.color = "#990099";
     thishour.color = "green";
@@ -556,21 +579,21 @@ function updateHours(thislatitude) {
     for (i = 0; i < hourangles.count; i++) {
 
         // morning
-        var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+        var thishour = makeRect(0.5, maxheightorwidth/20.0, 0.5);
         var thisquathour = quatFromAxisAngle(0,0,1,hourangles.morning[i]);
         var thisquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
         var thisquat = quaternionMultiply([thisquatnorth, thisquathour]);
-        thishour = transformObject(thishour,0,canvas.width/3,0);
+        thishour = transformObject(thishour,0,maxheightorwidth/3,0);
         thishour = rotateObject(thishour,thisquat);
         thishour.color = "red";
         hours.push(thishour);
 
         // afternoon
-        var thishour = makeRect(0.5, canvas.width/20.0, 0.5);
+        var thishour = makeRect(0.5, maxheightorwidth/20.0, 0.5);
         var thisquathour = quatFromAxisAngle(0,0,1,hourangles.afternoon[i]);
         var thisquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
         var thisquat = quaternionMultiply([thisquatnorth, thisquathour]);
-        thishour = transformObject(thishour,0,canvas.width/3,0);
+        thishour = transformObject(thishour,0,maxheightorwidth/3,0);
         thishour = rotateObject(thishour,thisquat);
         thishour.color = "blue";
         hours.push(thishour);
