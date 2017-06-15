@@ -22,7 +22,8 @@ var headingnorth;
     
 var canvas;
 var context;
-var display;
+var statusdiv;
+var latitudediv;
 var maxheightorwidth;
 
 var gyro;
@@ -47,12 +48,15 @@ function init () {
     // get latitude, heading north
     // callback to setPosition which starts setup()
     // otherwise, use default latitude and do setup()
+
+    latitudediv = document.getElementById("latitude");
+    statusdiv = document.getElementById("status");
  
     if (navigator.geolocation) {
         // callback setPosition calls setup() when finished
         navigator.geolocation.getCurrentPosition(setPosition, showError);
     } else {
-        display.innerHTML = "Geolocation not supported in this browser.";
+        latitudediv.innerHTML = "Geolocation not supported in this browser.";
         setup();
     }
 
@@ -81,9 +85,7 @@ function init () {
     // document.addEventListener("click",showInformation);
     // document.addEventListener("touchStart",showInformation);
 
-    // canvas setup
-    
-    display = document.getElementById("latitude");
+    // canvas setup    
 
     canvas = document.getElementById('gyroCanvas');
     context = canvas.getContext('2d');
@@ -602,14 +604,21 @@ function updateHours(thislatitude) {
     return hours;
 }
 
-function updateStatus (thisrendercount) {
-
+function updateStatus (thisrendercount, thisstatusdiv, thismessage) {
+    /*
     if (thisrendercount < 30)
         document.getElementById("status").innerHTML = "Determining position . . . <span id='cursor'>|<span>";
     if (thisrendercount > 60 && thisrendercount < 90)
         document.getElementById("status").innerHTML = "** ready ** <span id='cursor'>|<span>";
     if (thisrendercount > 90)
         document.getElementById("status").innerHTML = "<span id='cursor'>|<span>";
+    */
+    thisstatusdiv.innerHTML = thismessage;
+
+    if (debug && rendercount < 1) {
+        console.log(thisstatusdiv);
+        console.log(thismessage);
+    }
 }
 
 function renderObj(obj,q) {
@@ -741,7 +750,8 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
-    updateStatus (rendercount);
+    // updateStatus (rendercount);
+    updateStatus (rendercount, statusdiv, "this is what i need to say<span id='cursor'>|</span>");
     rendercount ++;
 }
 
@@ -775,23 +785,23 @@ function setPosition(position) {
     latitude = position.coords.latitude.toFixed(4);
     if (position.coords.heading)
         headingnorth = position.coords.heading.toFixed(4);
-    display.innerHTML = latitude + "&deg;";
+    latitudediv.innerHTML = latitude + "&deg;";
     setup();
 }
 
 function showError(error) {
     switch(error.code) {
         case error.PERMISSION_DENIED:
-            display.innerHTML = "User denied request for Geolocation."
+            latitudediv.innerHTML = "User denied request for Geolocation."
             break;
         case error.POSITION_UNAVAILABLE:
-            display.innerHTML = "Location information unavailable."
+            latitudediv.innerHTML = "Location information unavailable."
             break;
         case error.TIMEOUT:
-            display.innerHTML = "Request for user location timed out."
+            latitudediv.innerHTML = "Request for user location timed out."
             break;
         case error.UNKNOWN_ERROR:
-            display.innerHTML = "Unknown error occurred."
+            latitudediv.innerHTML = "Unknown error occurred."
             break;
     }
 }

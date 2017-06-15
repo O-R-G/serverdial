@@ -58,18 +58,18 @@ x gnomon should always start pointing north
   use numbers in rendercount to trigger sequential events
 x animate gyro loading
 + calculateHourAngles() hours distribution for more than 11 hours
-/ calculateShadowAngle() logic
-
 + horizontal canvas sizing in landscape mode
   compute on the fly in .js
 
-- animateMesasage.js to replace css
+/ animateMesasage.js to replace css
 
+/ calculateShadowAngle() logic
 
-
-/ background color
-- catch errors on user block location
+/ background color #CCC ?
+- add message for downloading software
+- catch errors if user block location
 - implement sun or no sun
+  sun or no sun could also change background color?
 - requestAnimationFrame() ?
 - google analytics
  
