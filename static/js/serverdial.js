@@ -19,6 +19,8 @@ var debug = true;
 
 var latitude;     
 var headingnorth;           
+var geolocateable;
+var gyroscopeable;
     
 var canvas;
 var context;
@@ -69,10 +71,11 @@ function init () {
     canvas = document.getElementById('serverdialcanvas');
 
     if (navigator.geolocation) {
-        // callback setPosition calls setup() when finished
+        // setPosition calls setup() when finished
+        // could do a proper callback ** fix **
         navigator.geolocation.getCurrentPosition(setPosition, showError);
     } else {
-        geolocatelatitude.innerHTML = "Geolocation not supported in this browser.";
+        geolocatelatitude.innerHTML = "Geolocation is not supported in this browser.";
         setup();
     }
 
@@ -81,6 +84,7 @@ function init () {
     gyro = quatFromAxisAngle(0,0,0,0);
  
     if (window.DeviceOrientationEvent) {
+        gyroscopeable = true;
         window.addEventListener("deviceorientation", function () {
             processGyro(event.alpha, event.beta, event.gamma); 
         }, true);
@@ -92,6 +96,11 @@ function init () {
     prevTouchX = -1; // -1 is flag for no previous touch info
     prevTouchY = -1;
 
+    // prevent rubberband scrolling
+    document.ontouchstart = function(e){ 
+        e.preventDefault(); 
+    }
+
     document.addEventListener("touchstart", touchStartFunc, true);
     document.addEventListener("touchmove", touchmoveFunc, true);
     document.addEventListener("touchend", touchEndFunc, true);
@@ -99,7 +108,7 @@ function init () {
     document.addEventListener("mousemove", mouseMoveFunc, true);
     document.addEventListener("mouseup", mouseUpFunc, true);
 
-    // canvas setup    
+    // canvas    
 
     context = canvas.getContext('2d');
     context.canvas.width  = window.innerWidth; // resize canvas to whatever window dimensions are
@@ -114,17 +123,14 @@ function init () {
 
     // temporary workaround
 
-    geolocatelatitude.innerHTML = latitude + "&deg;";   
-    setup();
+    // geolocatelatitude.innerHTML = latitude + "&deg;";   
+    // setup();
 }
 
 function setup () {
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
     if (!headingnorth) headingnorth = 30.0000;
-
-    // sun?
-    sun = checkSun(new Date(), latitude);   // should be in update()?
 
     // populate stage
     
@@ -142,11 +148,19 @@ function setup () {
     gnomon.color = "#009999";
     hours.color = "#00FF00";
 
+    // ** fix ** callback() logic here
+    // updateStatus("Currently . . . Latitude : " + latitude + "&deg", start);
+
+    // sun?
+    sun = checkSun(new Date(), latitude);   // should be in update()?   
+                                            // right now, this leads to a callback from updateStatus to start()
+    /*
     if (window.self)
         start();
+    */
 }
 
-function start () {
+function start() {
 
     renderTimer = window.setInterval(renderLoop, 1000/20);
 }
@@ -618,13 +632,16 @@ function updateHours(thislatitude) {
     return hours;
 }
 
-function updateStatus (thismessage) {
-    
+function updateStatus(thismessage, callback) {
+
+    // could / should add a callback function in here    
     // ** fix ** better to do this in animateMessage
-    thismessage += "<span id='cursor'>|</span>";
+    // thismessage += "<span id='cursor'>|</span>";
 
     if (animatemessageready) {
         updateMessage("status-source", "status-display", thismessage, true, 40);
+        if (callback)
+            callback();
         return true;
     } else {
         return false;
@@ -763,16 +780,11 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
-    if (rendercount == 20)
-        updateStatus("init...");
-    if (rendercount == 30)
-        updateStatus("finding geolocation");
-    if (rendercount == 90)
+    if (rendercount && rendercount % 150 == 0)
         updateStatus("** ready **");
-    if (rendercount % 300 === 0)
-        updateStatus("This serverdial is designed for mobile devices. Please visit http://www.serverdial.org on your phone or tablet.");
-    if (rendercount % 200 === 0)
-        updateStatus("** ready **");
+
+    if (!gyroscopeable && rendercount && rendercount % 300 == 0 )
+        updateStatus("This serverdial is designed for mobile devices. Please visit http://www.serverdial.org on a phone or tablet.");
 
     rendercount ++;
 }
@@ -822,7 +834,7 @@ function showError(error) {
     }
 }
 
-function checkSun (now, thislatitude) {
+function checkSun(now, thislatitude) {
 
     // sunrise sunset
     // using suncalc library to get sunrise and sunset based on latitude
@@ -833,6 +845,9 @@ function checkSun (now, thislatitude) {
         sun = true;
     else 
         sun = false;
+
+    // updateStatus("Currently . . . ", start);
+    updateStatus("Currently . . . Latitude : " + thislatitude + "&deg; Sunrise : " + sunrise + " Sunset : " + sunset, start);
 
     if (debug) {
         console.log(sunrise);

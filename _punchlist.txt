@@ -62,17 +62,19 @@ x animate gyro loading
   compute on the fly in .js
 + animateMesasage.js replaces css
 + css colors
-
-- implement sun or no sun
-
-- message for downloading software
-
-- mtdbt2f font?
-
+/ updateStatus with callback 
+  for now, updateStatus() has a callback 
+  in checkSun() which triggers start()
++ implement sun or no sun
++ mtdbt2f font
++ non-mobile message
++ webapp meta tags
 
 / calculateShadowAngle() logic
-/ geolocation debug and errors    
-- catch errors if user block location
 
+x geolocation debug
+- block rubberband scrolling on desktop
+- catch errors if user blocks location
+- cursor blink
 - requestAnimationFrame() ?
 - google analytics
