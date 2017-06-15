@@ -17,6 +17,11 @@
 		color:#333;
 	}
 
+    #status-source {
+        visibility: hidden;
+        display: none;
+    }
+
 	#gyroscope {
 		position:fixed;
 		bottom:10px;
@@ -34,19 +39,14 @@
 		color:#333;
 	}
 
-    #ticker-display,
-    #ticker-source {
-        color: #F00;
-    }
-
-    #ticker-wrapper {
-    }
-
 </style>
 
 
 <div id="status">
-    <span id="cursor">|</span>
+    <div id="status-display"></div>
+    <div id="status-source">
+        This is a test. This is only a test. <span id="cursor">|</span>    
+    </div>
 </div>
     
 <div id="geolocate">
@@ -69,13 +69,6 @@
     -->
 </div>
 
-<div id="ticker-wrapper">
-    <div id="ticker-display"></div>
-    <div id="ticker-source" class="hidden">
-        This is a test. This is only a test. <span id="cursor">|</span>    
-    </div>
-</div>
-
 <canvas id="serverdialcanvas"></canvas>
 
 <script src='static/js/suncalc/suncalc.js'></script>
@@ -84,25 +77,7 @@
 <script>
     // (...) is a self-invoking function
     ( function () {
-        init ();
-        // document.onload = 
-        // initMessage("ticker-source","ticker-display",true,40);
-        // initMessage("ticker-source","status",true,40);
-
-    // update the ticker
-    // document.getElementById("ticker-source").innerHTML = "and also";
-    // document.getElementById("ticker-source").innerHTML = "and also";
-    // initMessage("ticker-source","ticker-display",true,40);
-    // need to add a clear message display method in animatemessage.js
-
+        init();
+        initMessage("status-source","status-display",true,40);
     } )();
 </script>
-
-
-<!--
-// animate-message related
-// how to do blinking cursor?
-        
-animate = true;            
-tickerDelay = 40;
--->

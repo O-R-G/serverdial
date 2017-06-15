@@ -449,9 +449,11 @@ function calculateShadowAngle(thislatitude, thisseconds) {
     // ** fix ** logic problem here to do with getting accurate time displayed as shadow
     // if (thisshadowangle.radians < 0) thisshadowangle.radians += Math.PI;
 
+    /*
     if (debug && rendercount < 20) 
        // console.log(thisshadowangle);
        console.log(radToDeg(thisshadowangle.radians));
+    */
 
 	return thisshadowangle;
 }
@@ -615,24 +617,19 @@ function updateHours(thislatitude) {
 }
 
 function updateStatus (thisrendercount, thismessage) {
-    /*
-    if (thisrendercount < 30)
-        status.innerHTML = "Determining position . . . <span id='cursor'>|<span>";
-    if (thisrendercount > 60 && thisrendercount < 90)
-        status.innerHTML = "** ready ** <span id='cursor'>|<span>";
-    if (thisrendercount > 90)
-        status.innerHTML = "<span id='cursor'>|<span>";
-    */
 
     // must use document.getElementById for scope reasons
     // as this comes from a different asynchronous thread
     // as part of the renderLoop() callback
-    document.getElementById("status").innerHTML = thismessage;
+    // changing of messages is done in renderloop
+    // although that logic could be here
+    // status-source is the name of the div to draw from 
+    // for animate-message.js
 
-    if (debug && rendercount < 1) {
-        console.log(status);
-        console.log(thismessage);
-    }
+    // call clearMessage() here 
+
+    document.getElementById("status-source").innerHTML = thismessage;
+
 }
 
 function renderObj(obj,q) {
@@ -764,17 +761,14 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
-    // updateStatus (rendercount);
-    // updateStatus (rendercount, "okokokokokokokokok");
-
     if (rendercount < 30)
         var message = "init";
     if (rendercount > 30 && rendercount < 90)
         var message = "finding geolocation";
     if (rendercount > 90)
         var message = "** ready **";
-
     updateStatus(rendercount, message);
+
     rendercount ++;
 }
 
