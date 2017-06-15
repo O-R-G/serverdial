@@ -61,18 +61,18 @@ x animate gyro loading
 + horizontal canvas sizing in landscape mode
   compute on the fly in .js
 + animateMesasage.js replaces css
++ css colors
 
-- css colors
+- implement sun or no sun
 
-/ calculateShadowAngle() logic
-- geolocation debug and errors    
-- catch errors if user block location
+- message for downloading software
 
 - mtdbt2f font?
 
-- add message for downloading software
-- implement sun or no sun
-  sun or no sun could also change background color?
+
+/ calculateShadowAngle() logic
+/ geolocation debug and errors    
+- catch errors if user block location
 
 - requestAnimationFrame() ?
 - google analytics

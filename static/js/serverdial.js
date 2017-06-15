@@ -724,7 +724,10 @@ function renderLoop() {
         gnomon = updateGnomon(rendercount);
 
     // animate shadow
-    if (rendercount*1500 < seconds && animate) 
+    // 1500 number is essentially speed for this
+    // if (rendercount*1500 < seconds && animate) 
+    if (rendercount*100 < seconds && animate) 
+        // shadow = updateShadow(latitude, rendercount*1500);
         shadow = updateShadow(latitude, rendercount*1500);
     else 
         shadow = updateShadow(latitude, seconds);
