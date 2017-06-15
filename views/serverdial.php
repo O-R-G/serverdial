@@ -14,7 +14,7 @@
 		top:10px;
 		left:10px;
 		/* visibility: hidden; */
-		color:#333;
+		color:#CCC;
 	}
 
     #status-source {

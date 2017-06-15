@@ -60,14 +60,13 @@ x animate gyro loading
 + calculateHourAngles() hours distribution for more than 11 hours
 + horizontal canvas sizing in landscape mode
   compute on the fly in .js
++ animateMesasage.js replaces css
 
-/ animateMesasage.js to replace css
+- css colors
 
 / calculateShadowAngle() logic
-
 - geolocation debug and errors    
 - catch errors if user block location
-- css colors
 
 - mtdbt2f font?
 

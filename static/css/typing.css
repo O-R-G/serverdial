@@ -2,6 +2,7 @@
 
 /* ids */
 
+/*
 #status {
     /* specify position in global.css */
     /* background-color: #FFF; */  
@@ -14,11 +15,11 @@
 #status:nth-child(2){
   animation: type2 2s steps(60, end);
 }
+*/
 
 #cursor {
   animation: cursorblink 1s infinite;
 }
-
 
 /* animation */
 

@@ -13,7 +13,7 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = false;
+var simulategyro = true;
 var rendercount = 0;
 var debug = true;
 
@@ -622,6 +622,9 @@ function updateHours(thislatitude) {
 
 function updateStatus (thismessage) {
     
+    // ** fix ** better to do this in animateMessage
+    thismessage += "<span id='cursor'>|</span>";
+
     if (animatemessageready) {
         updateMessage("status-source", "status-display", thismessage, true, 40);
         return true;
@@ -764,6 +767,10 @@ function renderLoop() {
     if (rendercount == 30)
         updateStatus("finding geolocation");
     if (rendercount == 90)
+        updateStatus("** ready **");
+    if (rendercount % 300 === 0)
+        updateStatus("This serverdial is designed for mobile devices. Please visit http://www.serverdial.org on your phone or tablet.");
+    if (rendercount % 200 === 0)
         updateStatus("** ready **");
 
     rendercount ++;

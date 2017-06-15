@@ -22,7 +22,7 @@ function initMessage(sourceId, displayId, animate, delay)
 	var message = buildMessage(source);
 
 	pointer = 0;
-    
+
 	if(animate) 
 	{
 		clearTimeout(messageTimeout);
@@ -35,20 +35,6 @@ function initMessage(sourceId, displayId, animate, delay)
 		display.appendChild(message);
 	
     animatemessageready = true;
-}
-
-function updateMessage(sourceId, displayId, newmessage, animate, delay) {
-
-    var source = document.getElementById(sourceId);
-    var display = document.getElementById(displayId);
-
-    clearMessage(display);        
-    source.innerHTML = newmessage;
-    stopAnimateMessage();
-
-    initMessage("status-source","status-display",true,40);
-
-	return true;
 }
 
 function buildMessage(root) 
@@ -85,6 +71,20 @@ function clearMessage(root) {
 
     while (root.hasChildNodes())
         root.removeChild(root.firstChild);
+
+	return true;
+}
+
+function updateMessage(sourceId, displayId, newmessage, animate, delay) {
+
+    var source = document.getElementById(sourceId);
+    var display = document.getElementById(displayId);
+
+    clearMessage(display);        
+    source.innerHTML = newmessage;
+    stopAnimateMessage();
+
+    initMessage("status-source","status-display",true,40);
 
 	return true;
 }
