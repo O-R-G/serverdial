@@ -22,8 +22,13 @@ var headingnorth;
     
 var canvas;
 var context;
-var statusdiv;
-var latitudediv;
+var status;
+var geolocate;
+var geolocatelatitude;
+var gyroscope;
+var gyroscopealpha;
+var gyroscopebeta;
+var gyroscopegamma;
 var maxheightorwidth;
 
 var gyro;
@@ -49,16 +54,25 @@ function init () {
     // callback to setPosition which starts setup()
     // otherwise, use default latitude and do setup()
 
-    latitudediv = document.getElementById("latitude");
-    statusdiv = document.getElementById("status");
- 
+    // get div objects
+    status = document.getElementById("status");
+    geolocate = document.getElementById("geolocate");
+    geolocatelatitude = document.getElementById("geolocatelatitude");
+    gyroscope = document.getElementById("gyroscope");
+	gyroscopealpha = document.getElementById("gyroscopealpha");
+	gyroscopebeta = document.getElementById("gyroscopebeta");
+	gyroscopegamma = document.getElementById("gyroscopegamma");
+    canvas = document.getElementById('serverdialcanvas');
+
+    /*
     if (navigator.geolocation) {
         // callback setPosition calls setup() when finished
         navigator.geolocation.getCurrentPosition(setPosition, showError);
     } else {
-        latitudediv.innerHTML = "Geolocation not supported in this browser.";
+        geolocatelatitude.innerHTML = "Geolocation not supported in this browser.";
         setup();
     }
+    */
 
     // gyroscope
 
@@ -82,23 +96,24 @@ function init () {
     document.addEventListener("mousedown", mouseDownFunc, true);
     document.addEventListener("mousemove", mouseMoveFunc, true);
     document.addEventListener("mouseup", mouseUpFunc, true);
-    // document.addEventListener("click",showInformation);
-    // document.addEventListener("touchStart",showInformation);
 
     // canvas setup    
 
-    canvas = document.getElementById('gyroCanvas');
     context = canvas.getContext('2d');
     context.canvas.width  = window.innerWidth; // resize canvas to whatever window dimensions are
     context.canvas.height = window.innerHeight;
     context.translate(canvas.width / 2, canvas.height / 2); // move origin to center of screen
-    // context.font = "20px mtdbt2f-HHH";      // need to have this available and prepped as webfont .eot .woff etc
     context.fillStyle = "#EEE";
 
     if ( context.canvas.width > context.canvas.height ) 
         maxheightorwidth = context.canvas.height;
     else 
         maxheightorwidth = context.canvas.width;
+
+    // temporary workaround
+
+    geolocatelatitude.innerHTML = latitude + "&deg;";   
+    setup();
 }
 
 function setup () {
@@ -479,10 +494,7 @@ function mouseUpFunc(e) {
   prevTouchY = -1;
 }
 	
-function userXYmove(x,y) {
-	// document.getElementById("userX").innerHTML=x; 
-	// document.getElementById("userY").innerHTML=y;
-	
+function userXYmove(x,y) {	
 	if(prevTouchX != -1 ) //need valid prevTouch info to calculate swipe
 	{
         var xMovement=x-prevTouchX;
@@ -500,16 +512,14 @@ function userXYmove(x,y) {
 }
 
 function showInformation () {
-	if (document.getElementById('gyroInfo').style.visibility=='hidden') {
-		document.getElementById('gyroInfo').style.visibility='visible';
-		document.getElementById('quatInfo').style.visibility='visible';
-		document.getElementById('geoInfo').style.visibility='visible';
+	if (gyroscope.style.visibility=='hidden') {
+		geolocate.style.visibility='visible';
+		gyroscope.style.visibility='visible';
 		showinfo = true;
 		return true;
 	} else {
-		document.getElementById('gyroInfo').style.visibility='hidden';
-		document.getElementById('quatInfo').style.visibility='hidden';
-		document.getElementById('geoInfo').style.visibility='hidden';
+		geolocate.style.visibility='hidden';
+        gyroscope.style.visibility='hidden';
 		showinfo = false;
 		return false;
 	}
@@ -604,19 +614,23 @@ function updateHours(thislatitude) {
     return hours;
 }
 
-function updateStatus (thisrendercount, thisstatusdiv, thismessage) {
+function updateStatus (thisrendercount, thismessage) {
     /*
     if (thisrendercount < 30)
-        document.getElementById("status").innerHTML = "Determining position . . . <span id='cursor'>|<span>";
+        status.innerHTML = "Determining position . . . <span id='cursor'>|<span>";
     if (thisrendercount > 60 && thisrendercount < 90)
-        document.getElementById("status").innerHTML = "** ready ** <span id='cursor'>|<span>";
+        status.innerHTML = "** ready ** <span id='cursor'>|<span>";
     if (thisrendercount > 90)
-        document.getElementById("status").innerHTML = "<span id='cursor'>|<span>";
+        status.innerHTML = "<span id='cursor'>|<span>";
     */
-    thisstatusdiv.innerHTML = thismessage;
+
+    // must use document.getElementById for scope reasons
+    // as this comes from a different asynchronous thread
+    // as part of the renderLoop() callback
+    document.getElementById("status").innerHTML = thismessage;
 
     if (debug && rendercount < 1) {
-        console.log(thisstatusdiv);
+        console.log(status);
         console.log(thismessage);
     }
 }
@@ -751,7 +765,16 @@ function renderLoop() {
     }
 
     // updateStatus (rendercount);
-    updateStatus (rendercount, statusdiv, "this is what i need to say<span id='cursor'>|</span>");
+    // updateStatus (rendercount, "okokokokokokokokok");
+
+    if (rendercount < 30)
+        var message = "init";
+    if (rendercount > 30 && rendercount < 90)
+        var message = "finding geolocation";
+    if (rendercount > 90)
+        var message = "** ready **";
+
+    updateStatus(rendercount, message);
     rendercount ++;
 }
 
@@ -770,38 +793,32 @@ function map (value, currentmin, currentmax, targetmin, targetmax) {
 
 function processGyro(alpha,beta,gamma) { 	
 	gyro = computeQuaternionFromEulers(alpha,beta,gamma);
-	document.getElementById("alpha").innerHTML = alpha.toFixed(5);
-	document.getElementById("beta").innerHTML = beta.toFixed(5);
-	document.getElementById("gamma").innerHTML = gamma.toFixed(5);
-	/*
-    document.getElementById("x").innerHTML = gyro.x.toFixed(5);
-	document.getElementById("y").innerHTML = gyro.y.toFixed(5);
-	document.getElementById("z").innerHTML = gyro.z.toFixed(5);
-	document.getElementById("w").innerHTML = gyro.w.toFixed(5);
-    */
+    gyroscopealpha.innerHTML = alpha.toFixed(5);
+    gyroscopebeta.innerHTML = beta.toFixed(5);
+    gyroscopegamma.innerHTML = gamma.toFixed(5);
 }
 
 function setPosition(position) {
     latitude = position.coords.latitude.toFixed(4);
     if (position.coords.heading)
         headingnorth = position.coords.heading.toFixed(4);
-    latitudediv.innerHTML = latitude + "&deg;";
+    geolocatelatitude.innerHTML = latitude + "&deg;";
     setup();
 }
 
 function showError(error) {
     switch(error.code) {
         case error.PERMISSION_DENIED:
-            latitudediv.innerHTML = "User denied request for Geolocation."
+            geolocatelatitude.innerHTML = "User denied request for Geolocation."
             break;
         case error.POSITION_UNAVAILABLE:
-            latitudediv.innerHTML = "Location information unavailable."
+            geolocatelatitude.innerHTML = "Location information unavailable."
             break;
         case error.TIMEOUT:
-            latitudediv.innerHTML = "Request for user location timed out."
+            geolocatelatitude.innerHTML = "Request for user location timed out."
             break;
         case error.UNKNOWN_ERROR:
-            latitudediv.innerHTML = "Unknown error occurred."
+            geolocatelatitude.innerHTML = "Unknown error occurred."
             break;
     }
 }

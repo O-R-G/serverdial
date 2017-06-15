@@ -73,4 +73,8 @@ x animate gyro loading
 - requestAnimationFrame() ?
 - google analytics
  
- 
+!!!! sort out divs naming between .js and .php
+#status
+#geolocation 
+#gyroscope
+seach for document.get

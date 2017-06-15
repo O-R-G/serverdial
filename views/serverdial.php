@@ -17,15 +17,7 @@
 		color:#333;
 	}
 
-	#gyroInfo {		  
-		position:fixed;
-		top:100px;
-		left:10px;
-		visibility: hidden;
-		color:#333;
-	}
-
-	#quatInfo {
+	#gyroscope {
 		position:fixed;
 		bottom:10px;
 		right:10px;
@@ -34,7 +26,7 @@
 		color:#333;
 	}
 
-	#geoInfo {
+	#geolocate {
 		position:fixed;
 		bottom:10px;
 		left:10px;
@@ -56,14 +48,19 @@
 <div id="status">
     <span id="cursor">|</span>
 </div>
-
-<div id="gyroInfo">		
-</div>
     
-<div id="quatInfo">
-	&alpha;: <span id="alpha"></span><br />
-	&beta;: <span id="beta"></span><br />
-	&gamma;: <span id="gamma"></span><br />
+<div id="geolocate">
+	<!--
+    X: <span id="userX"></span><br />
+    Y: <span id="userY"></span><br />
+    -->
+	<span id="geolocatelatitude"></span><br />
+</div>
+
+<div id="gyroscope">
+	&alpha;: <span id="gyroscopealpha"></span><br />
+	&beta;: <span id="gyroscopebeta"></span><br />
+	&gamma;: <span id="gyroscopegamma"></span><br />
     <!--
 	x: <span id="x">x</span><br />
 	y: <span id="y">y</span><br />
@@ -71,22 +68,6 @@
 	w: <span id="w">w</span><br /> 
     -->
 </div>
-    
-<div id="geoInfo">
-	<!--
-    X: <span id="userX"></span><br />
-    Y: <span id="userY"></span><br />
-    -->
-	<span id="latitude"></span><br />
-</div>
-
-<div id="geoInfo">
-	<!--
-    X: <span id="userX"></span><br />
-    Y: <span id="userY"></span><br />
-    -->
-	<span id="latitude"></span><br />
-</div>
 
 <div id="ticker-wrapper">
     <div id="ticker-display"></div>
@@ -95,14 +76,7 @@
     </div>
 </div>
 
-<div id="ticker-wrapper">
-    <div id="ticker-display"></div>
-    <div id="ticker-source" class="hidden">
-        This is a test. This is only a test. <span id="cursor">|</span>    
-    </div>
-</div>
-
-<canvas id="gyroCanvas"></canvas>
+<canvas id="serverdialcanvas"></canvas>
 
 <script src='static/js/suncalc/suncalc.js'></script>
 <script src='static/js/animate-message.js'></script>
@@ -112,7 +86,7 @@
     ( function () {
         init ();
         // document.onload = 
-        initMessage("ticker-source","ticker-display",true,40);
+        // initMessage("ticker-source","ticker-display",true,40);
         // initMessage("ticker-source","status",true,40);
 
     // update the ticker
