@@ -566,7 +566,7 @@ function updateShadow(thislatitude, thisseconds) {
     var thisshadowquat = quaternionMultiply([thisshadowquatnorth, thisshadowquattime]);
     thisshadow = transformObject(thisshadow,0,maxheightorwidth/6.0,0);
     thisshadow = rotateObject(thisshadow,thisshadowquat);
-    thisshadow.color = "#666666";
+    thisshadow.color = "#FFFFFF";
 
     return thisshadow;
 }
