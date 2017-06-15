@@ -10,8 +10,10 @@
 
 // 	globals
 
+var animatemessageready;
 var messageTimeout;
 var pointer;
+var ready;
 
 function initMessage(sourceId, displayId, animate, delay) 
 {
@@ -20,7 +22,7 @@ function initMessage(sourceId, displayId, animate, delay)
 	var message = buildMessage(source);
 
 	pointer = 0;
-
+    
 	if(animate) 
 	{
 		clearTimeout(messageTimeout);
@@ -32,7 +34,21 @@ function initMessage(sourceId, displayId, animate, delay)
 	else 
 		display.appendChild(message);
 	
-	// hideShowMessage('displayWrapper','displayControl','show');
+    animatemessageready = true;
+}
+
+function updateMessage(sourceId, displayId, newmessage, animate, delay) {
+
+    var source = document.getElementById(sourceId);
+    var display = document.getElementById(displayId);
+
+    clearMessage(display);        
+    source.innerHTML = newmessage;
+    stopAnimateMessage();
+
+    initMessage("status-source","status-display",true,40);
+
+	return true;
 }
 
 function buildMessage(root) 
@@ -72,31 +88,6 @@ function clearMessage(root) {
 
 	return true;
 }
-
-function updateMessage(sourceId, displayId, animate, delay) {
-
-    // 0. clearMessage(root)
-    // 1. update ticker-source with new innerHTML
-    // 2. initMessage()
-
-    var source = document.getElementById(sourceId);
-    var display = document.getElementById(displayId);
-
-    clearMessage(display);        
-    stopAnimateMessage();
-
-    // temp, as this will be set in the html doc not here
-    // or should it be set here? perhaps ...
-
-    document.getElementById("status-source").innerHTML = "this new message...";
-        
-    initMessage("status-source","status-display",true,40);
-
-	return true;
-}
-
-
-
 
 function animateMessage(source,display,message,delay) 
 {	

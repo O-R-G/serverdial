@@ -65,16 +65,15 @@ x animate gyro loading
 
 / calculateShadowAngle() logic
 
-/ background color #CCC ?
-- add message for downloading software
+- geolocation debug and errors    
 - catch errors if user block location
+- css colors
+
+- mtdbt2f font?
+
+- add message for downloading software
 - implement sun or no sun
   sun or no sun could also change background color?
+
 - requestAnimationFrame() ?
 - google analytics
- 
-!!!! sort out divs naming between .js and .php
-#status
-#geolocation 
-#gyroscope
-seach for document.get

@@ -23,6 +23,8 @@ var headingnorth;
 var canvas;
 var context;
 var status;
+var statussource;
+var statusdisplay;
 var geolocate;
 var geolocatelatitude;
 var gyroscope;
@@ -56,6 +58,8 @@ function init () {
 
     // get div objects
     status = document.getElementById("status");
+    statussource = document.getElementById("status-source");
+    statusdisplay = document.getElementById("status-display");
     geolocate = document.getElementById("geolocate");
     geolocatelatitude = document.getElementById("geolocatelatitude");
     gyroscope = document.getElementById("gyroscope");
@@ -616,20 +620,14 @@ function updateHours(thislatitude) {
     return hours;
 }
 
-function updateStatus (thisrendercount, thismessage) {
-
-    // must use document.getElementById for scope reasons
-    // as this comes from a different asynchronous thread
-    // as part of the renderLoop() callback
-    // changing of messages is done in renderloop
-    // although that logic could be here
-    // status-source is the name of the div to draw from 
-    // for animate-message.js
-
-    // call clearMessage() here 
-
-    document.getElementById("status-source").innerHTML = thismessage;
-
+function updateStatus (thismessage) {
+    
+    if (animatemessageready) {
+        updateMessage("status-source", "status-display", thismessage, true, 40);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function renderObj(obj,q) {
@@ -761,13 +759,12 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
-    if (rendercount < 30)
-        var message = "init";
-    if (rendercount > 30 && rendercount < 90)
-        var message = "finding geolocation";
-    if (rendercount > 90)
-        var message = "** ready **";
-    updateStatus(rendercount, message);
+    if (rendercount == 20)
+        updateStatus("init...");
+    if (rendercount == 30)
+        updateStatus("finding geolocation");
+    if (rendercount == 90)
+        updateStatus("** ready **");
 
     rendercount ++;
 }
