@@ -68,7 +68,6 @@ function init () {
 	gyroscopegamma = document.getElementById("gyroscopegamma");
     canvas = document.getElementById('serverdialcanvas');
 
-    /*
     if (navigator.geolocation) {
         // callback setPosition calls setup() when finished
         navigator.geolocation.getCurrentPosition(setPosition, showError);
@@ -76,7 +75,6 @@ function init () {
         geolocatelatitude.innerHTML = "Geolocation not supported in this browser.";
         setup();
     }
-    */
 
     // gyroscope
 
