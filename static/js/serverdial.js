@@ -144,7 +144,7 @@ function setup () {
                 
     xaxis.color = "#FF0000";
     yaxis.color = "#00CC00";
-    zaxis.color ="#0000FF";
+    zaxis.color ="#0066FF";
     gnomon.color = "#009999";
     hours.color = "#00FF00";
 
@@ -640,7 +640,8 @@ function updateHours(thislatitude) {
         var thisquat = quaternionMultiply([thisquatnorth, thisquathour]);
         thishour = transformObject(thishour,0,maxheightorwidth/3,0);
         thishour = rotateObject(thishour,thisquat);
-        thishour.color = "blue";
+        // thishour.color = "blue";
+        thishour.color = "#06F";
         hours.push(thishour);
     }
 
