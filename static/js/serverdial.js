@@ -154,6 +154,7 @@ function setup () {
     // sun?
     sun = checkSun(new Date(), latitude);   // should be in update()?   
                                             // right now, this leads to a callback from updateStatus to start()
+
     /*
     if (window.self)
         start();
@@ -426,13 +427,15 @@ function calculateHourAngles(thislatitude, thisstarthour) {
 
         angleincrement += 15;
     }
-
+    
+    /*
     if (debug && rendercount < 1) {
         console.log(rendercount);
         console.log(thisstarthour);
         console.log(thishourangles.morning);
         console.log(thishourangles.afternoon);
     }
+    */
 
 	return thishourangles;
 }
@@ -465,12 +468,21 @@ function calculateShadowAngle(thislatitude, thisseconds) {
     // ** fix ** logic problem here to do with getting accurate time displayed as shadow
     // if (thisshadowangle.radians < 0) thisshadowangle.radians += Math.PI;
 
-    /*
-    if (debug && rendercount < 20) 
-       // console.log(thisshadowangle);
-       console.log(radToDeg(thisshadowangle.radians));
-    */
+    // if (thisshadowangle.radians < 0) thisshadowangle.radians += Math.PI/2;
+    if (thisshadowangle.radians < 0) thisshadowangle.radians += Math.PI;
 
+    if (debug && rendercount < 40) {
+       console.log(rendercount + " : " + thisshadowangle.radians);
+       // console.log(radToDeg(thisshadowangle.radians));
+    }
+/*
+    if (debug && rendercount < 1) {
+        console.log(rendercount);
+        console.log(thisstarthour);
+        console.log(thishourangles.morning);
+        console.log(thishourangles.afternoon);
+    }
+*/
 	return thisshadowangle;
 }
 
@@ -741,13 +753,11 @@ function renderLoop() {
         gnomon = updateGnomon(rendercount);
 
     // animate shadow
-    // 1500 number is essentially speed for this
-    // if (rendercount*1500 < seconds && animate) 
-    if (rendercount*100 < seconds && animate) 
-        // shadow = updateShadow(latitude, rendercount*1500);
+    if (rendercount * 2000 < seconds && animate) 
         shadow = updateShadow(latitude, rendercount*1500);
     else 
-        shadow = updateShadow(latitude, seconds);
+        shadow = updateShadow(latitude, seconds);       
+    // shadow = updateShadow(latitude, seconds);    
 
     // animate gryo
     if (simulategyro) {
@@ -773,7 +783,8 @@ function renderLoop() {
     // the userQuat is what has been adjusted with touch or mouse events by user
 
     renderObj(gnomon,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
-    renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
+    if (sun)
+        renderObj(shadow,quaternionMultiply([inverseQuaternion(gyro),userQuat]));
 
     for (i = 0; i < hours.length; i++) {
         renderObj(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
@@ -783,8 +794,8 @@ function renderLoop() {
     if (rendercount && rendercount % 150 == 0)
         updateStatus("** ready **");
 
-    if (!gyroscopeable && rendercount && rendercount % 300 == 0 )
-        updateStatus("This serverdial is designed for mobile devices. Please visit http://www.serverdial.org on a phone or tablet.");
+    if (!gyroscopeable && rendercount && rendercount % 600 == 0 )
+        updateStatus("Please visit http://www.serverdial.org on a phone or tablet.");
 
     rendercount ++;
 }
@@ -847,14 +858,17 @@ function checkSun(now, thislatitude) {
         sun = false;
 
     // updateStatus("Currently . . . ", start);
-    updateStatus("Currently . . . Latitude : " + thislatitude + "&deg; Sunrise : " + sunrise + " Sunset : " + sunset, start);
+    // updateStatus("Currently . . . Latitude : " + thislatitude + "&deg; Sunrise : " + sunrise + " Sunset : " + sunset, start);
+    updateStatus("Currently . . . " + thislatitude + "&deg;", start);
 
+    /*
     if (debug) {
         console.log(sunrise);
         console.log(now);
         console.log(sunset);
         console.log(sun);
     }
+    */
 
     return sun;
 }

@@ -69,10 +69,9 @@ x animate gyro loading
 + mtdbt2f font
 + non-mobile message
 + webapp meta tags
-
-/ calculateShadowAngle() logic
-
++ calculateShadowAngle() logic
 x geolocation debug
+/ updateShadow animate adjust
 - block rubberband scrolling on desktop
 - catch errors if user blocks location
 - cursor blink
