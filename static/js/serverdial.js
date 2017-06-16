@@ -89,9 +89,7 @@ function init () {
         window.addEventListener("deviceorientation", function () {
             processGyro(event.alpha, event.beta, event.gamma); 
         }, true);
-    } else {
-        gyroscopeable = false;
-    }
+    } 
 
     // event listeners
 
@@ -775,6 +773,8 @@ function renderLoop() {
        	        this.fakeBeta = (this.fakeBeta || 0)+ .7;//x axis
                 this.fakeGamma = (this.fakeGamma || 0)+ .5;//y axis
     	        processGyro(this.fakeAlpha,this.fakeBeta,this.fakeGamma);
+                if (gyroscopeable) 
+                    gyroscopeable = false;
             }
         // }
     }
