@@ -13,7 +13,7 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = false;
+var simulategyro = true;
 var rendercount = 0;
 var debug = true;
 
