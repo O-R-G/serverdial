@@ -846,6 +846,7 @@ function showError(error) {
             geolocatelatitude.innerHTML = "Unknown error occurred."
             break;
     }
+    setup();
 }
 
 function checkSun(now, thislatitude) {
