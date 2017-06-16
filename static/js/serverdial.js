@@ -89,6 +89,8 @@ function init () {
         window.addEventListener("deviceorientation", function () {
             processGyro(event.alpha, event.beta, event.gamma); 
         }, true);
+    } else {
+        gyroscopeable = false;
     }
 
     // event listeners
