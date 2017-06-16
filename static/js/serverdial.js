@@ -13,7 +13,7 @@
 
 var showinfo;	
 var animate = true;
-var simulategyro = true;
+var simulategyro = false;
 var rendercount = 0;
 var debug = true;
 
@@ -584,7 +584,10 @@ function updateShadow(thislatitude, thisseconds) {
     // one for current time, one for heading north
 
     var thisshadow = makeRect(1.0, maxheightorwidth/3.0, 0.0);
-    var shadowangle = calculateShadowAngle(thislatitude, thisseconds);      
+    var shadowangle = calculateShadowAngle(thislatitude, thisseconds);
+    // ** fix ** this is a hack way to set the numbers straight but works
+    if (shadowangle.am)
+        shadowangle.radians -= Math.PI;
     var thisshadowquattime = quatFromAxisAngle(0,0,1,-shadowangle.radians);
     var thisshadowquatnorth = quatFromAxisAngle(0,0,1,-degToRad(headingnorth));    
     var thisshadowquat = quaternionMultiply([thisshadowquatnorth, thisshadowquattime]);
@@ -753,11 +756,11 @@ function renderLoop() {
         gnomon = updateGnomon(rendercount);
 
     // animate shadow
-    if (rendercount * 2000 < seconds && animate) 
+    // ** fix ** this animate number is rando
+    if (rendercount * 1500 < seconds * 3 && animate) 
         shadow = updateShadow(latitude, rendercount*1500);
     else 
         shadow = updateShadow(latitude, seconds);       
-    // shadow = updateShadow(latitude, seconds);    
 
     // animate gryo
     if (simulategyro) {

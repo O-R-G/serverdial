@@ -72,6 +72,7 @@ x animate gyro loading
 + calculateShadowAngle() logic
 x geolocation debug
 / updateShadow animate adjust
+- debug updateShadow()
 - block rubberband scrolling on desktop
 - catch errors if user blocks location
 - cursor blink
