@@ -20,7 +20,7 @@ var debug = true;
 var latitude;     
 var headingnorth;           
 var geolocateable;
-var gyroscopeable;
+var gyroscopeable = false;
     
 var canvas;
 var context;
@@ -122,7 +122,8 @@ function init () {
         maxheightorwidth = context.canvas.width;
 
     // temporary workaround
-
+        
+    // gyroscopeable = false;
     // geolocatelatitude.innerHTML = latitude + "&deg;";   
     // setup();
 }
