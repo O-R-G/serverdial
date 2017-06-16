@@ -20,7 +20,7 @@ var debug = true;
 var latitude;     
 var headingnorth;           
 var geolocateable;
-var gyroscopeable = false;
+var gyroscopeable;
     
 var canvas;
 var context;
@@ -82,8 +82,9 @@ function init () {
     // gyroscope
 
     gyro = quatFromAxisAngle(0,0,0,0);
- 
-    if (window.DeviceOrientationEvent) {
+
+    if (window.DeviceOrientationEvent) {            
+    // if(!( window.DeviceOrientationEvent && 'ontouchstart' in window)) {
         gyroscopeable = true;
         window.addEventListener("deviceorientation", function () {
             processGyro(event.alpha, event.beta, event.gamma); 
@@ -123,7 +124,6 @@ function init () {
 
     // temporary workaround
         
-    // gyroscopeable = false;
     // geolocatelatitude.innerHTML = latitude + "&deg;";   
     // setup();
 }
@@ -800,7 +800,7 @@ function renderLoop() {
     if (rendercount && rendercount % 150 == 0)
         updateStatus("** ready **");
 
-    if (!gyroscopeable && rendercount && rendercount % 600 == 0 )
+    if (!gyroscopeable && rendercount && rendercount % 100 == 0 )
         updateStatus("Please visit http://www.serverdial.org on a phone or tablet.");
 
     rendercount ++;
