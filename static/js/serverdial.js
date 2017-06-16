@@ -799,10 +799,15 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
+    /*
     if (rendercount && rendercount % 150 == 0)
         updateStatus("** ready **");
+    */
 
-    if (!gyroscopeable && rendercount && rendercount % 100 == 0 )
+    if (rendercount && rendercount == 150)
+        updateStatus("** ready **");
+
+    if (!gyroscopeable && rendercount && rendercount % 300 == 0 )
         updateStatus("Please visit http://www.serverdial.org on a phone or tablet.");
 
     rendercount ++;
