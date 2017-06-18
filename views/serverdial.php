@@ -13,7 +13,7 @@
 		position:fixed;
 		top:10px;
 		left:10px;
-		/* visibility: hidden; */
+        margin-right:10px;        
 		color:#CCC;
 	}
 

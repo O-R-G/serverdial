@@ -18,10 +18,10 @@ x hour lines
 + update shadow position *in process*
 + update shadow redrawing and debug
 + understand vertex logic
-/ fill triangles as shapes
-/ shadow blur transparent gradient
-/ draw hours as type logic
-/ canvas fonts, roman numerals
+x fill triangles as shapes
+x shadow blur transparent gradient
+x draw hours as type logic
+x canvas fonts, roman numerals
 + number layout (latitude)
   http://www.crbond.com/papers/sundial.pdf
   see pp.4-5:
@@ -72,7 +72,10 @@ x animate gyro loading
 + calculateShadowAngle() logic
 x geolocation debug
 / updateShadow animate adjust
-- debug updateShadow()
++ debug updateShadow()
++ line weight adjust
+- updateStatus callback logic
+- webapp manifest
 - block rubberband scrolling on desktop
 - catch errors if user blocks location
 - cursor blink

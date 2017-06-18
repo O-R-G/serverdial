@@ -668,8 +668,8 @@ function updateStatus(thismessage, callback) {
 function renderObj(obj,q) {
 
 	var rotatedObj = rotateObject(obj,q);
-	// context.lineWidth = 1.0;    // [1.0]
-	context.lineWidth = 4.0;    // [1.0]
+	// context.lineWidth = 3.0;    // [1.0] 4.0
+	context.lineWidth = maxheightorwidth / 300;
 	context.strokeStyle = obj.color;
 	
 	function scaleByZ(val,z) {
