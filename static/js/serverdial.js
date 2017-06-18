@@ -15,7 +15,7 @@ var showinfo;
 var animate = true;
 var simulategyro = true;
 var rendercount = 0;
-var debug = true;
+var debug = false;
 
 var latitude;     
 var headingnorth;           
@@ -46,6 +46,9 @@ var zaxis;
 var gnomon;
 var shadow;
 var hours;
+
+var rendertimer;
+var updatestatustimer;
 
 var sun;
 
@@ -78,6 +81,7 @@ function init () {
         geolocatelatitude.innerHTML = "Geolocation is not supported in this browser.";
         setup();
     }
+
 
     // gyroscope
 
@@ -122,16 +126,15 @@ function init () {
     else 
         maxheightorwidth = context.canvas.width;
 
-    // temporary workaround
-        
-    // geolocatelatitude.innerHTML = latitude + "&deg;";   
-    // setup();
+    // setup() is called from setPosition or else from above if geolocation fails
 }
 
 function setup () {
 
     if (!latitude) latitude = 56.1629;          // default to aarhus
     if (!headingnorth) headingnorth = 30.0000;
+
+    updateStatus("Currently . . . " + latitude + "&deg;");
 
     // populate stage
     
@@ -149,17 +152,11 @@ function setup () {
     gnomon.color = "#009999";
     hours.color = "#00FF00";
 
-    // ** fix ** callback() logic here
-    // updateStatus("Currently . . . Latitude : " + latitude + "&deg", start);
-
     // sun?
     sun = checkSun(new Date(), latitude);   // should be in update()?   
-                                            // right now, this leads to a callback from updateStatus to start()
 
-    /*
     if (window.self)
         start();
-    */
 }
 
 function start() {
@@ -651,16 +648,22 @@ function updateHours(thislatitude) {
 
 function updateStatus(thismessage, callback) {
 
-    // could / should add a callback function in here    
-    // ** fix ** better to do this in animateMessage
-    // thismessage += "<span id='cursor'>|</span>";
+    // check to see if ready for next message
+    // if not, then setinterval to check again
+    // until it is ready
+    // animatemessageready is a boolean in animate-message.js
+
+    updatestatustimer = null;
 
     if (animatemessageready) {
+
         updateMessage("status-source", "status-display", thismessage, true, 40);
         if (callback)
             callback();
         return true;
     } else {
+ 
+        updatestatustimer = window.setInterval(function() { updateStatus(thismessage); }, 1000/20);
         return false;
     }
 }
@@ -799,11 +802,6 @@ function renderLoop() {
         // renderType(hours[i],quaternionMultiply([inverseQuaternion(gyro),inverseQuaternion(gyro),userQuat]));
     }
 
-    /*
-    if (rendercount && rendercount % 150 == 0)
-        updateStatus("** ready **");
-    */
-
     if (rendercount && rendercount == 150)
         updateStatus("** ready **");
 
@@ -871,18 +869,14 @@ function checkSun(now, thislatitude) {
     else 
         sun = false;
 
-    // updateStatus("Currently . . . ", start);
-    // updateStatus("Currently . . . Latitude : " + thislatitude + "&deg; Sunrise : " + sunrise + " Sunset : " + sunset, start);
-    updateStatus("Currently . . . " + thislatitude + "&deg;", start);
+    updateStatus("Sunrise: " + sunrise + " Sunset: " + sunset);
 
-    /*
     if (debug) {
         console.log(sunrise);
         console.log(now);
         console.log(sunset);
         console.log(sun);
     }
-    */
 
     return sun;
 }

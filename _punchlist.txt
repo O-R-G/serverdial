@@ -71,10 +71,14 @@ x animate gyro loading
 + webapp meta tags
 + calculateShadowAngle() logic
 x geolocation debug
-/ updateShadow animate adjust
+x updateShadow animate adjust
 + debug updateShadow()
 + line weight adjust
-- updateStatus callback logic
+/ updateStatus callback logic
+  updateStatus() with a callback to set ready to true
+  or checkstatus() and if 
+  if updateStatusReady then updateStatus
+   else set interval updateStatusReady
 - webapp manifest
 - block rubberband scrolling on desktop
 - catch errors if user blocks location

@@ -33,7 +33,7 @@ function initMessage(sourceId, displayId, animate, delay)
 	} 
 	else 
 		display.appendChild(message);
-	
+
     animatemessageready = true;
 }
 
